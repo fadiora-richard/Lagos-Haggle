@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lagos Market: The Art of the Haggle</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2226%22 font-size=%2228%22>🇳🇬</text></svg>">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo-container">
+      <span class="danfo-badge">LAGOS 01</span>
+      <div>
+        <h1 style="font-size: 1.15rem; font-weight: 800; line-height: 1.1;">LAGOS HAGGLE</h1>
+        <p style="font-size: 0.72rem; color: var(--text-secondary);">Market Survival & Negotiation Simulator</p>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <!-- Mode Toggle -->
+      <div class="mode-toggle-group">
+        <button id="btnModeFree" class="mode-btn active">🛍️ Free Practice</button>
+        <button id="btnModeCampaign" class="mode-btn">🧺 Saturday Errand</button>
+      </div>
+
+      <button id="btnOpenTutorial" class="market-chip" style="display: flex; align-items: center; gap: 0.4rem; background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fef08a;">
+        <span>📖</span> <span>How to Play</span>
+      </button>
+
+      <button id="btnOpenDrip" class="market-chip" style="display: flex; align-items: center; gap: 0.4rem;">
+        <span>👔</span> <span id="currentDripLabel">Market Soldier</span>
+      </button>
+
+      <button id="btnSoundToggle" class="market-chip" style="display: flex; align-items: center; gap: 0.4rem;">
+        <span id="soundIcon">🔊</span> <span id="soundText">Sound ON</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Transit Notification Toast -->
+  <div id="transitToast" class="transit-toast">
+    <span>🚌</span> <span id="transitToastText">Entering Danfo to Yaba...</span>
+  </div>
+
+  <!-- Campaign HUD Bar (Visible in Saturday Errand mode) -->
+  <div id="campaignHud" class="campaign-hud">
+    <div class="campaign-hud-card">
+      <div class="hud-stat">
+        <div class="hud-stat-icon">👵🏾</div>
+        <div class="hud-stat-info">
+          <span class="hud-label">Mama's Family Budget</span>
+          <span id="hudBudgetRemaining" class="hud-value highlight-green">₦85,000</span>
+        </div>
+      </div>
+
+      <div class="hud-stat">
+        <div class="hud-stat-icon">📋</div>
+        <div class="hud-stat-info">
+          <span class="hud-label">Current Quest Target</span>
+          <span id="hudCurrentTarget" class="hud-value">Item 1/3: Real Dutch Wax</span>
+        </div>
+      </div>
+
+      <div class="hud-stat">
+        <div class="hud-stat-icon">💰</div>
+        <div class="hud-stat-info">
+          <span class="hud-label">Your Pocket Money (Saved)</span>
+          <span id="hudPocketMoney" class="hud-value highlight-yellow">₦0</span>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; margin-left: auto;">
+        <button id="btnQuitCampaign" class="market-chip" style="font-size: 0.75rem; padding: 0.4rem 0.85rem; background: rgba(239, 68, 68, 0.18); color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); font-weight: 700; cursor: pointer;" title="Quit Saturday Errand & return to Free Mode">
+          ✕ Quit Errand
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Market Selection Navigation -->
+  <div id="marketSelectorBar" class="market-selector-bar">
+    <!-- Populated by JS: Yaba, Balogun, Computer Village -->
+  </div>
+
+  <!-- Main Haggle Stage -->
+  <main class="main-stage">
+    <!-- Left Column: Seller & Item Info -->
+    <div class="glass-card">
+      <!-- 2D Interactive Sprite Stage -->
+      <div id="spriteStageBox" class="sprite-stage-box">
+        <div class="sprite-stage-bg"></div>
+        <div id="rainOverlay" class="rain-overlay"></div>
+        
+        <!-- Player Sprite -->
+        <div style="display: flex; flex-direction: column; align-items: center; z-index: 6;">
+          <div id="playerSpriteSvg"></div>
+          <span style="font-size: 0.65rem; font-weight: 800; color: #34d399; margin-top: 2px;">YOU</span>
+        </div>
+
+        <!-- Wooden Stall Counter Center -->
+        <div class="stall-counter-wood">LAGOS STALL</div>
+
+        <!-- Seller Sprite -->
+        <div style="display: flex; flex-direction: column; align-items: center; z-index: 6;">
+          <div id="sellerSpriteSvg"></div>
+          <span id="sellerSpriteLabel" style="font-size: 0.65rem; font-weight: 800; color: #f59e0b; margin-top: 2px;">SELLER</span>
+        </div>
+      </div>
+
+      <div class="seller-profile">
+        <div id="sellerAvatar" class="seller-avatar">👔</div>
+        <div class="seller-info">
+          <h2 id="sellerName">Bros Emeka</h2>
+          <span id="sellerTitle" class="seller-title">Senior Okrika Merchant</span>
+        </div>
+      </div>
+
+      <!-- Seller Patience -->
+      <div class="patience-box">
+        <div class="patience-label-row">
+          <span>Seller Patience / Mood</span>
+          <span id="patiencePercentText">100% (Chill)</span>
+        </div>
+        <div class="patience-bar-track">
+          <div id="patienceBarFill" class="patience-bar-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Items Switcher for Stall -->
+      <div style="margin-bottom: 0.75rem;">
+        <label style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.4rem;">
+          Select Item on Stall:
+        </label>
+        <select id="itemSelectDropdown" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; padding: 0.6rem; border-radius: 8px; font-weight: 600; font-family: inherit; cursor: pointer; outline: none;">
+          <!-- Items populated via JS -->
+        </select>
+      </div>
+
+      <!-- Item Card -->
+      <div class="item-card">
+        <div class="item-icon-header">
+          <span id="itemIcon" class="item-big-icon">🧥</span>
+          <div>
+            <h3 id="itemName" class="item-title">Vintage Oversized Denim</h3>
+            <span id="itemAuthenticityBadge" style="font-size: 0.7rem; color: #10b981; font-weight: 700;">AUTHENTIC LAGOS FIND</span>
+          </div>
+        </div>
+        <p id="itemDesc" class="item-desc">
+          Grade-1 Okrika from UK bale. Heavyweight, washed once, smells like vintage thrift.
+        </p>
+
+        <div class="item-pricing-row">
+          <div>
+            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block;">SELLER ASKING PRICE</span>
+            <span id="askingPriceDisplay" class="asking-price-tag">₦28,000</span>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.7rem; color: var(--text-secondary); display: block;">ROUNDS</span>
+            <span id="roundsCountDisplay" style="font-weight: 700; font-size: 1.1rem; color: #fff;">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Negotiation Arena -->
+    <div class="glass-card arena-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff;">Market Dialogue</h3>
+        <span id="statusBadge" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
+          NEGOTIATING
+        </span>
+      </div>
+
+      <!-- Speech Bubbles History -->
+      <div id="dialogueContainer" class="dialogue-history">
+        <!-- Bubbles rendered by JS -->
+      </div>
+
+      <!-- Street Tactical Banter Box -->
+      <div class="tactics-box">
+        <div class="tactics-title-row">
+          <span>Street Tactics (1x per Stall)</span>
+          <span style="font-size: 0.7rem; color: #f59e0b; font-weight: 700;">Tactical Moves</span>
+        </div>
+        <div class="tactics-grid">
+          <button id="btnTacticSweetTalk" class="tactic-btn" data-tactic="sweet_talk" title="Praise the seller to recover patience">
+            <span>🍯 Sweet Talk</span>
+            <span style="font-size: 0.65rem; color: #10b981;">+Patience</span>
+          </button>
+          <button id="btnTacticFaultFind" class="tactic-btn" data-tactic="fault_find" title="Inspect loose threads or scratches to force a price drop">
+            <span>🔍 Inspect Fault</span>
+            <span style="font-size: 0.65rem; color: #f59e0b;">-Price Drop</span>
+          </button>
+          <button id="btnTacticFakeCall" class="tactic-btn" data-tactic="fake_call" title="Pretend a shop at front is selling cheaper">
+            <span>📞 Fake Call</span>
+            <span style="font-size: 0.65rem; color: #38bdf8;">Bluff Front</span>
+          </button>
+          <button id="btnTacticShowCash" class="tactic-btn" data-tactic="show_cash" title="Slap hard cash on the counter for instant deal">
+            <span>💵 Show Cash</span>
+            <span style="font-size: 0.65rem; color: #f43f5e;">Instant Close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Negotiation Controls -->
+      <div class="controls-container">
+        <!-- Quick Offer Shortcuts -->
+        <div class="quick-buttons-row">
+          <button class="quick-btn" data-pct="0.80">-20% Off</button>
+          <button class="quick-btn" data-pct="0.65">-35% Off</button>
+          <button class="quick-btn" data-pct="0.50">Half Price (50%)</button>
+          <button class="quick-btn" data-pct="0.35">Hard Lowball (35%)</button>
+        </div>
+
+        <!-- Custom Counter Input -->
+        <form id="offerForm" class="offer-input-group" style="position: relative;">
+          <div class="input-currency-wrapper">
+            <span class="currency-symbol">₦</span>
+            <input type="text" id="offerInput" class="offer-input" placeholder="Type offer (e.g. 10k, 12,000, 500)..." autocomplete="off" required>
+            <span id="offerLivePreview" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; font-weight: 700; color: #10b981; pointer-events: none; display: none;"></span>
+          </div>
+          <button type="submit" class="btn-primary-offer">
+            <span>Counter</span> ➔
+          </button>
+        </form>
+
+        <!-- Accept & Walk Away -->
+        <div class="action-buttons-row">
+          <button id="btnAcceptCurrent" class="btn-accept">
+            Accept <span id="btnAcceptPriceText">₦28,000</span>
+          </button>
+          <button id="btnWalkAway" class="btn-walk-away">
+            🚶 Walk Away (Lagos Walkout)
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- EAFC DEAL EVALUATION MODAL -->
+  <div id="gradeModal" class="modal-overlay">
+    <div class="grade-card">
+      <div id="gradeBadge" class="eafc-badge bg-emerald-500">A+</div>
+      <h2 id="gradeTitle" class="eafc-title">Senior Street Veteran</h2>
+      <p id="gradeComment" class="eafc-comment">You squeezed all the fluff out of this seller!</p>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Opening Quote</span>
+          <span id="statOpening" class="stat-value">₦28,000</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Final Agreed</span>
+          <span id="statAgreed" class="stat-value highlight">₦11,500</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Seller Secret Floor</span>
+          <span id="statFloor" class="stat-value">₦9,000</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Money Saved</span>
+          <span id="statSaved" class="stat-value highlight">₦16,500 (59%)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Rounds Fought</span>
+          <span id="statRounds" class="stat-value">3</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Seller Patience Left</span>
+          <span id="statPatience" class="stat-value">64%</span>
+        </div>
+      </div>
+
+      <button id="btnPlayAgain" class="btn-restart">Haggle Another Item</button>
+    </div>
+  </div>
+
+  <!-- DRAMATIC CALLBACK MODAL ("CUSTOMER COME BACK!") -->
+  <div id="callbackModal" class="modal-overlay">
+    <div class="grade-card" style="border-color: #f59e0b;">
+      <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🏃‍♂️💨</div>
+      <div class="callback-banner">
+        <h2 style="font-size: 1.5rem; font-weight: 900; text-transform: uppercase;">"Customer, Wait! Come Back!"</h2>
+        <p id="callbackQuote" style="font-size: 0.95rem; margin-top: 0.5rem; font-weight: 600;">
+          Which kind wahala be this... Oya take am for ₦10,000!
+        </p>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        Your walkout worked! The seller is desperate not to lose the morning trade.
+      </p>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btnAcceptCallback" class="btn-accept" style="flex: 1; padding: 0.85rem;">
+          Turn Around & Pay <span id="callbackPriceTag">₦10,000</span>
+        </button>
+        <button id="btnRejectCallback" class="btn-walk-away" style="flex: 1; padding: 0.85rem;">
+          Keep Walking (Leave Shop)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KICKED OUT / WALKED AWAY MODAL -->
+  <div id="lossModal" class="modal-overlay">
+    <div class="grade-card" style="border-color: #ef4444;">
+      <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🚪🏃‍♂️</div>
+      <h2 id="lossTitle" class="eafc-title" style="color: #f87171;">Deal Collapsed!</h2>
+      <p id="lossMessage" class="eafc-comment">
+        The seller got tired of the drama and showed you the road. No market today!
+      </p>
+
+      <button id="btnLossRetry" class="btn-restart">Try Another Stall</button>
+    </div>
+  </div>
+
+  <!-- CAMPAIGN INTRO MODAL (MAMA'S ERRAND BRIEFING) -->
+  <div id="campaignIntroModal" class="modal-overlay">
+    <div class="grade-card" style="border-color: #f59e0b; max-width: 520px; position: relative;">
+      <button id="btnCloseCampaignIntro" class="tutorial-close-btn" style="position: absolute; right: 18px; top: 16px;" title="Cancel & Return to Free Mode">&times;</button>
+      <div style="font-size: 3.5rem; margin-bottom: 0.25rem;">👵🏾</div>
+      <h2 id="campaignIntroTitle" class="eafc-title" style="color: #f59e0b;">Saturday Errand Briefing</h2>
+      
+      <!-- Errand Difficulty Selector -->
+      <div class="difficulty-selector" id="campaignDifficultySelector">
+        <button class="diff-btn" data-diff="quick">🥪 Quick (2 Items)</button>
+        <button class="diff-btn active" data-diff="standard">🧺 Standard (3 Items)</button>
+        <button class="diff-btn" data-diff="mega">🚚 Mega Owanbe (4 Items)</button>
+      </div>
+
+      <p id="campaignIntroBudgetText" style="font-size: 0.85rem; color: #10b981; font-weight: 800; margin-bottom: 0.85rem; text-transform: uppercase;">
+        MISSION BUDGET: ₦85,000 CASH
+      </p>
+
+      <div style="background: rgba(15, 23, 42, 0.7); border-radius: 12px; padding: 1.1rem; text-align: left; margin-bottom: 1.25rem; border: 1px solid var(--border-color);">
+        <p id="campaignIntroDialogue" style="font-size: 0.92rem; line-height: 1.5; color: #f8fafc; font-style: italic;">
+          "Listen to me well well..."
+        </p>
+        <ul id="campaignIntroQuestList" style="margin-top: 1rem; font-size: 0.85rem; color: #cbd5e1; list-style: disc; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.35rem;">
+          <!-- Dynamically populated -->
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+        <button id="btnCancelErrand" class="btn-walk-away" style="flex: 1; padding: 0.85rem; cursor: pointer;">
+          ✕ Cancel (Back to Free Mode)
+        </button>
+        <button id="btnStartErrand" class="btn-restart" style="flex: 2; margin-top: 0; cursor: pointer;">
+          Enter Market ➔ (Start Mission)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MID-TRIP LAGOS ROAD HAZARD MODAL -->
+  <div id="roadHazardModal" class="modal-overlay">
+    <div class="grade-card" style="border-color: #f59e0b; box-shadow: 0 0 35px rgba(245, 158, 11, 0.45); max-width: 500px;">
+      <div id="hazardIcon" style="font-size: 3.5rem; margin-bottom: 0.5rem;">🥤</div>
+      <h2 id="hazardTitle" class="eafc-title" style="color: #f59e0b;">Third Mainland Bridge Go-Slow!</h2>
+      <p id="hazardDesc" class="eafc-comment" style="color: #f8fafc; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.25rem;">
+        Traffic is crawling at 5km/h. A street hawker taps your bus window holding ice-cold Lacasera and hot Gala!
+      </p>
+
+      <div id="hazardOptionsList" class="hazard-options-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MAMA'S HOME REPORT CARD MODAL -->
+  <div id="mamaReportModal" class="modal-overlay">
+    <div class="grade-card" style="max-width: 520px;">
+      <div id="mamaBadge" class="eafc-badge bg-emerald-500">S</div>
+      <div style="font-size: 2.5rem; margin-top: -0.5rem; margin-bottom: 0.5rem;">👵🏾</div>
+      <h2 id="mamaVerdictTitle" class="eafc-title">Pride of the Ancestors</h2>
+      <p id="mamaVerdictQuote" class="eafc-comment">"Chai! My pikin! Blood of smart people dey run inside your vein!"</p>
+
+      <div class="stats-grid" style="margin-bottom: 1rem;">
+        <div class="stat-item">
+          <span class="stat-label">Initial Budget</span>
+          <span id="mamaStatInitialBudget" class="stat-value">₦85,000</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Spent</span>
+          <span id="mamaStatSpent" class="stat-value">₦38,500</span>
+        </div>
+        <div class="stat-item" style="grid-column: span 2; background: rgba(16, 185, 129, 0.15); padding: 0.6rem; border-radius: 8px;">
+          <span class="stat-label" style="color: #34d399;">Your Pocket Money Kept:</span>
+          <span id="mamaStatSaved" class="stat-value highlight" style="font-size: 1.4rem;">₦46,500</span>
+        </div>
+        <div class="stat-item" style="grid-column: span 2; background: rgba(56, 189, 248, 0.12); padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.25);">
+          <span class="stat-label" style="color: #38bdf8;">Authenticity Inspection:</span>
+          <span id="mamaStatAuthenticity" class="stat-value" style="font-size: 0.95rem; color: #f8fafc;">★ 2 Originals • 1 Replica</span>
+        </div>
+      </div>
+
+      <!-- Item Receipts with Authenticity & Mama's Commentary -->
+      <div id="mamaReceiptsList" class="receipts-list">
+        <!-- Rendered by JS -->
+      </div>
+
+      <button id="btnMamaRetry" class="btn-restart" style="margin-top: 1rem;">Run Another Saturday Errand</button>
+    </div>
+  </div>
+
+  <!-- DRIP / PERSONA CUSTOMIZER MODAL -->
+  <div id="dripModal" class="modal-overlay">
+    <div class="grade-card" style="max-width: 620px; max-height: 88vh; overflow-y: auto; border-color: #38bdf8;">
+      <div style="font-size: 3rem; margin-bottom: 0.35rem;">👔👕👟</div>
+      <h2 class="eafc-title" style="color: #38bdf8;">Select Your Market Drip</h2>
+      <p class="eafc-comment" style="margin-bottom: 1.25rem;">
+        How you dress dictates your street reputation, opening quotes, patience, and tactical superpowers. Every outfit has distinct advantages and disadvantages!
+      </p>
+
+      <div id="dripPresetsList" class="drip-grid">
+        <!-- Populated by JS -->
+      </div>
+
+      <button id="btnCloseDrip" class="btn-restart" style="background: #38bdf8; color: #0f172a;">
+        Confirm Drip & Return to Market
+      </button>
+    </div>
+  </div>
+
+  <!-- MARKET CHAOS EVENT MODAL -->
+  <div id="chaosModal" class="modal-overlay">
+    <div class="grade-card" style="border-color: #f43f5e; box-shadow: 0 0 30px rgba(244, 63, 94, 0.4);">
+      <div id="chaosIcon" style="font-size: 3.5rem; margin-bottom: 0.5rem;">⚠️</div>
+      <h2 id="chaosTitle" class="eafc-title" style="color: #fb7185;">Lagos Market Chaos!</h2>
+      <p id="chaosDescription" class="eafc-comment" style="color: #f8fafc; font-size: 0.95rem; line-height: 1.5;">
+        Another customer is trying to snatch your item!
+      </p>
+
+      <div id="chaosActions" style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
+        <!-- Populated dynamically based on event -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TUTORIAL / HOW TO PLAY MODAL (LAGOS MARKET 101) -->
+  <div id="tutorialModal" class="modal-overlay">
+    <div class="grade-card tutorial-card" style="max-width: 580px; border-color: #f59e0b; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.8rem;">🎓</span>
+          <div>
+            <h2 class="eafc-title" style="margin-bottom: 0; font-size: 1.25rem; color: #f59e0b;">Lagos Market 101</h2>
+            <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Street Survival Handbook</span>
+          </div>
+        </div>
+        <button id="btnCloseTutorial" class="tutorial-close-btn" title="Close Tutorial">&times;</button>
+      </div>
+
+      <!-- Tutorial Tab Navigation -->
+      <div class="tutorial-tabs" id="tutorialTabs">
+        <button class="tut-tab-btn active" data-step="0">1. The Golden Rule</button>
+        <button class="tut-tab-btn" data-step="1">2. Street Tactics</button>
+        <button class="tut-tab-btn" data-step="2">3. Market Drip</button>
+        <button class="tut-tab-btn" data-step="3">4. Saturday Errand</button>
+      </div>
+
+      <!-- Tutorial Content Container -->
+      <div id="tutorialSlidesContainer" class="tutorial-slides-container">
+        <!-- Slide 0: The Golden Rule (Bargaining & Walkout) -->
+        <div class="tut-slide active" data-slide="0">
+          <div class="tut-hero-box">
+            <span style="font-size: 2.2rem;">🚶‍♂️💨</span>
+            <div>
+              <h3 style="font-size: 1rem; color: #f8fafc; font-weight: 800;">Rule #1: Never Accept the First Price!</h3>
+              <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.4;">
+                Opening quotes in Lagos are ALWAYS inflated by 30% to 100%. Haggling is expected culture!
+              </p>
+            </div>
+          </div>
+          <div class="tut-points-list">
+            <div class="tut-point">
+              <span class="tut-point-icon">💬</span>
+              <div>
+                <b>Make Counter-Offers:</b> Type your price in the counter box (e.g. <code>10k</code>, <code>12,000</code>, <code>500</code>) or use quick percentage buttons (<code>-35%</code>, <code>Half Price</code>).
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">⚡</span>
+              <div>
+                <b>Mind the Patience Meter:</b> Audacious lowballs insult the seller and drain patience. If patience drops to <b>0%</b>, you get kicked out with empty hands!
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">🏃‍♂️</span>
+              <div>
+                <b>The Lagos Walkout (Walk Away):</b> If negotiations stall, click <b>Walk Away</b>. 75% of the time, the seller panics and screams <i>"Customer, come back!"</i>, dropping their price to rock-bottom!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 1: Street Tactics & Consequences -->
+        <div class="tut-slide" data-slide="1">
+          <div class="tut-hero-box" style="border-color: rgba(244, 63, 94, 0.4);">
+            <span style="font-size: 2.2rem;">🔍⚠️</span>
+            <div>
+              <h3 style="font-size: 1rem; color: #f8fafc; font-weight: 800;">Tactical Moves & Consequences</h3>
+              <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.4;">
+                You can use one tactical trick per stall. Use them with wisdom!
+              </p>
+            </div>
+          </div>
+          <div class="tut-points-list">
+            <div class="tut-point">
+              <span class="tut-point-icon">🍯</span>
+              <div>
+                <b>Sweet Talk:</b> Flatter the seller ("Chairman!", "Fine Mama!"). Softens their mood and restores <b>+22% to +35%</b> patience.
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">🔍</span>
+              <div>
+                <b>Inspect Fault:</b>
+                <br>• <i>On Replicas / Thrift:</i> Spots loose threads or flaws, forcing a <b>30% price reduction</b>!
+                <br>• <b style="color: #f87171;">⚠️ On Certified Originals:</b> BACKFIRES! Disrespecting genuine original material deeply insults the seller, triggers an immediate <b>PRICE HIKE</b>, and slashes <b>-25% patience</b>!
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">📞</span>
+              <div>
+                <b>Fake Call:</b> Pretend a front shop is selling cheaper. Panic forces an immediate undercut!
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">💵</span>
+              <div>
+                <b>Show Cash:</b> Slap raw cash on the stall table. Instant deal close if close to floor price!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Market Drip (Pros & Cons) -->
+        <div class="tut-slide" data-slide="2">
+          <div class="tut-hero-box" style="border-color: rgba(56, 189, 248, 0.4);">
+            <span style="font-size: 2.2rem;">👔👕</span>
+            <div>
+              <h3 style="font-size: 1rem; color: #f8fafc; font-weight: 800;">Every Drip Has Advantages & Disadvantages!</h3>
+              <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.4;">
+                How you dress dictates opening quotes, seller patience, and unique tactical superpowers. Pick the build that fits your style!
+              </p>
+            </div>
+          </div>
+          <div class="tut-points-list">
+            <div class="tut-point">
+              <span class="tut-point-icon">🪖</span>
+              <div>
+                <b>Market Soldier (Street Veteran):</b>
+                <div style="font-size: 0.76rem; color: #34d399; margin-top: 2px;">🟢 <b>Advantage:</b> Lowest opening quote (+10%), patience decays 25% slower, and Fake Call bluff is 100% believed.</div>
+                <div style="font-size: 0.76rem; color: #fb7185; margin-top: 2px;">🔴 <b>Disadvantage:</b> Show Cash fails on luxury goods, and high-end sellers start with lower patience.</div>
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">🎧</span>
+              <div>
+                <b>IJGB / Diaspora Returnee:</b>
+                <div style="font-size: 0.76rem; color: #34d399; margin-top: 2px;">🟢 <b>Advantage:</b> 95% Walkaway Callback rate (panicked sellers chase you), and Show Cash has +45% closing power.</div>
+                <div style="font-size: 0.76rem; color: #fb7185; margin-top: 2px;">🔴 <b>Disadvantage:</b> Starting prices are inflated by +80% ("Maga tax"), and lowballing triggers double patience loss.</div>
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">🎒</span>
+              <div>
+                <b>Student on a Budget:</b>
+                <div style="font-size: 0.76rem; color: #34d399; margin-top: 2px;">🟢 <b>Advantage:</b> Sweet Talk restores +38 patience, and audacious lowballs cost 45% less patience (lowball forgiveness).</div>
+                <div style="font-size: 0.76rem; color: #fb7185; margin-top: 2px;">🔴 <b>Disadvantage:</b> Show Cash is laughed off on luxury goods, and sellers ignore your walkouts (only 45% callback).</div>
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">👔</span>
+              <div>
+                <b>Island Banker (9-to-5er):</b>
+                <div style="font-size: 0.76rem; color: #34d399; margin-top: 2px;">🟢 <b>Advantage:</b> Sellers slash prices 15% faster per round due to lunch-hour urgency, with +20% Show Cash transfer credibility.</div>
+                <div style="font-size: 0.76rem; color: #fb7185; margin-top: 2px;">🔴 <b>Disadvantage:</b> Opening quote has a +45% salary tax, and starts with -15 base patience (rushed lunch clock).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Saturday Errand & Road Hazards -->
+        <div class="tut-slide" data-slide="3">
+          <div class="tut-hero-box" style="border-color: rgba(16, 185, 129, 0.4);">
+            <span style="font-size: 2.2rem;">👵🏾🧺</span>
+            <div>
+              <h3 style="font-size: 1rem; color: #f8fafc; font-weight: 800;">Saturday Errand & Road Hazards</h3>
+              <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.4;">
+                Mama sends you across Lagos with a tight budget. Every single Naira saved is YOUR pocket money!
+              </p>
+            </div>
+          </div>
+          <div class="tut-points-list">
+            <div class="tut-point">
+              <span class="tut-point-icon">🥪</span>
+              <div>
+                <b>Pick Difficulty:</b> Choose Quick (2 items), Standard (3 items), or Mega Owanbe (4 items). Budgets are dynamically calculated.
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">🥤</span>
+              <div>
+                <b>Mid-Trip Road Hazards:</b> Traffic jams, ice-cold Lacasera & Gala hawkers, pickpockets, and Danfo breakdowns happen between stalls!
+              </div>
+            </div>
+            <div class="tut-point">
+              <span class="tut-point-icon">🏆</span>
+              <div>
+                <b>Mama's Authenticity Inspection:</b> Mama checks your receipts and grades your savings from <b>S-Tier (Pride of the Ancestors)</b> to <b>F-Tier (Disowned)</b>!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tutorial Footer Controls -->
+      <div class="tutorial-footer">
+        <button id="btnPrevTutSlide" class="tut-nav-btn" style="visibility: hidden;">❮ Previous</button>
+        <div class="tut-dots" id="tutDots">
+          <span class="tut-dot active"></span>
+          <span class="tut-dot"></span>
+          <span class="tut-dot"></span>
+          <span class="tut-dot"></span>
+        </div>
+        <button id="btnNextTutSlide" class="btn-primary-offer" style="padding: 0.6rem 1.1rem; font-size: 0.85rem;">
+          <span>Next</span> ❯
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
