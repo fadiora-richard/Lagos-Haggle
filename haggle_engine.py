@@ -534,8 +534,8 @@ ROAD_HAZARDS_PY = [
     {
         "title": "Third Mainland Bridge Go-Slow!",
         "desc": "Traffic is crawling at 5km/h. A street hawker taps your bus window holding ice-cold Lacasera and hot Gala for ₦700.",
-        "opt1": ("Buy Cold Drink & Gala (Pay ₦700)", 700, "refresh", "Cold drink refreshed your soul! Arrived with high morale (+15 Patience bonus)!"),
-        "opt2": ("Endure the Lagos Heat (Save ₦700)", 0, "none", "You wiped sweat with shirt and kept your ₦700. Street discipline!")
+        "opt1": ("Buy Cold Drink & Gala", 700, "refresh", "Cold drink refreshed your soul! Arrived with high morale (+15 Patience bonus)!"),
+        "opt2": ("Endure the Lagos Heat", 0, "none", "You wiped sweat with shirt and kept your ₦700. Street discipline!")
     },
     {
         "title": "Ojuelegba Bus Stop Commotion!",
@@ -552,12 +552,18 @@ ROAD_HAZARDS_PY = [
     {
         "title": "Danfo Radiator Overheat!",
         "desc": "The yellow bus breaks down with steam pouring from the hood! Driver shouts: 'Everybody come down make una push!'",
-        "opt1": ("Take Quick Okada Motorcycle (Pay ₦1,000)", 1000, "none", "Okada zoomed through traffic like an arrow! Arrived in 3 minutes."),
-        "opt2": ("Help Push the Danfo (Save ₦1,000)", 0, "none", "You pushed the bus until it started. Hands dirty, but ₦1,000 saved!")
+        "opt1": ("Take Quick Okada Motorcycle", 1000, "none", "Okada zoomed through traffic like an arrow! Arrived in 3 minutes."),
+        "opt2": ("Help Push the Danfo", 0, "none", "You pushed the bus until it started. Hands dirty, but ₦1,000 saved!")
     }
 ]
 
-def play_stall(item: MarketItem, seller: Seller, drip: DripPresetPy = None, patience_bonus: int = 0) -> Tuple[bool, int, Dict]:
+def play_stall(
+    item: MarketItem,
+    seller: Seller,
+    drip: DripPresetPy = None,
+    patience_bonus: int = 0,
+    campaign_used_skills: Optional[set] = None
+) -> Tuple[bool, int, Dict]:
     print("\n" + "-" * 55)
     print(f"📍 STALL: {seller.name} ({seller.market})")
     print(f"📦 ITEM:  {item.name} {'[★ Certified Original]' if item.is_original else '[Grade Replica/Thrift]'}")
@@ -565,6 +571,8 @@ def play_stall(item: MarketItem, seller: Seller, drip: DripPresetPy = None, pati
     print("-" * 55)
 
     engine = NegotiationEnginePy(item, seller, drip)
+    stall_skill_used = False
+
     if patience_bonus > 0:
         engine.patience = min(100, engine.patience + patience_bonus)
         print(f"✨ Morale bonus applied! Starting Patience: {engine.patience}%")
@@ -604,17 +612,56 @@ def play_stall(item: MarketItem, seller: Seller, drip: DripPresetPy = None, pati
             else:
                 break
         elif choice == "4":
-            print("Choose Tactic: (a) 🍯 Sweet Talk  (b) 🔍 Inspect Fault  (c) 📞 Fake Call  (d) 💵 Show Cash")
-            t_choice = input("> ").strip().lower()
-            tac_map = {"a": "sweet_talk", "b": "fault_find", "c": "fake_call", "d": "show_cash"}
-            if t_choice in tac_map:
-                res_act, res_txt, res_price = engine.use_special_move(tac_map[t_choice])
-                print(f"\n⚡ TACTIC RESULT: {res_txt}")
-                if res_act == "agreed":
-                    print(f"\n🤝 Deal agreed at {format_naira(engine.agreed_price)}!")
-                    break
+            if campaign_used_skills is not None:
+                if stall_skill_used:
+                    print("⚠️ You can only use ONE skill per store during a Saturday errand run!")
+                    continue
+                rem_uses = max(0, 4 - len(campaign_used_skills))
+                print(f"Choose Tactic (1 per store • {rem_uses}/4 total uses left in run):")
             else:
-                print("Unknown tactic.")
+                if stall_skill_used:
+                    print("⚠️ You already used a tactic at this stall!")
+                    continue
+                print("Choose Tactic (1 use per stall):")
+
+            tac_names = {
+                "a": ("sweet_talk", "🍯 Sweet Talk"),
+                "b": ("fault_find", "🔍 Inspect Fault"),
+                "c": ("fake_call", "📞 Fake Call"),
+                "d": ("show_cash", "💵 Show Cash")
+            }
+            for k, (s_id, s_name) in tac_names.items():
+                status_str = ""
+                if campaign_used_skills is not None and s_id in campaign_used_skills:
+                    status_str = " [ALREADY USED IN RUN]"
+                print(f" ({k}) {s_name}{status_str}")
+            print(" (x) Cancel")
+
+            t_choice = input("> ").strip().lower()
+            if t_choice == "x" or t_choice not in tac_names:
+                continue
+
+            chosen_skill_id, chosen_skill_label = tac_names[t_choice]
+
+            if campaign_used_skills is not None and chosen_skill_id in campaign_used_skills:
+                print(f"❌ You already used '{chosen_skill_label}' earlier in this Saturday errand! (Max 1 use per skill across the run).")
+                continue
+
+            res_act, res_txt, res_price = engine.use_special_move(chosen_skill_id)
+            if res_act == "error":
+                print(f"⚠️ {res_txt}")
+                continue
+
+            stall_skill_used = True
+            if campaign_used_skills is not None:
+                campaign_used_skills.add(chosen_skill_id)
+                rem = max(0, 4 - len(campaign_used_skills))
+                print(f"⚡ TACTIC APPLIED: {chosen_skill_label} ({rem}/4 total skill uses left in run)")
+            print(f"⚡ TACTIC RESULT: {res_txt}")
+
+            if res_act == "agreed":
+                print(f"\n🤝 Deal agreed at {format_naira(engine.agreed_price)}!")
+                break
         elif choice == "q":
             return False, 0, {}
 
@@ -667,6 +714,7 @@ def play_campaign():
     spent = 0
     purchases = []
     pending_patience_bonus = 0
+    campaign_used_skills = set()
 
     print("\n" + "=" * 60)
     print("👵🏾 MAMA'S SATURDAY ERRAND BRIEFING")
@@ -707,7 +755,13 @@ def play_campaign():
 
         success = False
         while not success:
-            success, paid, eval_res = play_stall(item, seller, drip=CURRENT_DRIP_PY, patience_bonus=pending_patience_bonus)
+            success, paid, eval_res = play_stall(
+                item,
+                seller,
+                drip=CURRENT_DRIP_PY,
+                patience_bonus=pending_patience_bonus,
+                campaign_used_skills=campaign_used_skills
+            )
             pending_patience_bonus = 0
             if not success:
                 print("\nQuit this errand run and return to menu? (y/n)")
@@ -828,6 +882,8 @@ def show_tutorial():
     print("5. 🧺 SATURDAY ERRAND (CAMPAIGN MODE)")
     print(" • Mama gives you a tight calculated budget for 2, 3, or 4 items.")
     print(" • Every single Naira you save is YOUR PERSONAL POCKET MONEY!")
+    print(" • Street Skills: Limited to 1 skill per store, and max 4 skill uses total")
+    print("   across the entire run (once used, a skill cannot be picked again in that run)!")
     print(" • Beware of mid-trip road hazards (Gala hawkers, pickpockets, Danfo breakdown).")
     print(" • Return home for Mama's final authenticity inspection and EA FC grade!\n")
     print("=" * 65)

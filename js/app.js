@@ -15,6 +15,8 @@ class HaggleApp {
     this.currentErrandConfig = null;
     this.campaignManager = null;
     this.nextStallPatienceBonus = 0;
+    this.campaignUsedSkills = new Set(); // Skills consumed across entire Saturday run (max 4)
+    this.stallSkillUsedThisStore = false; // Only 1 skill per store
     this.currentMarketIndex = 0;
     this.currentItemIndex = 0;
     this.engine = null;
@@ -482,7 +484,21 @@ class HaggleApp {
   }
 
   handleSpecialMove(moveId, buttonEl) {
-    if (buttonEl.classList.contains("used")) return;
+    if (this.mode === "campaign") {
+      if (this.campaignUsedSkills.has(moveId)) {
+        alert("You already used this skill earlier in your Saturday errand! Each skill can only be used once per run.");
+        return;
+      }
+      if (this.stallSkillUsedThisStore || buttonEl.classList.contains("used")) {
+        alert("You can only use ONE skill per store during a Saturday errand run!");
+        return;
+      }
+    } else {
+      if (buttonEl.classList.contains("used") || this.stallSkillUsedThisStore) {
+        alert("You already used a tactic at this stall!");
+        return;
+      }
+    }
 
     if (moveId === "sweet_talk") {
       const res = this.engine.useSpecialMove("sweet_talk");
@@ -490,7 +506,7 @@ class HaggleApp {
         alert(res.error);
         return;
       }
-      buttonEl.classList.add("used");
+      this.finalizeSkillUse(moveId, buttonEl);
       sounds.playSweetTalk();
       this.appendDialogueBubble("player", "Chairman/Mama! Your face dey shine today! God go bless your market well well!", "bubble-player");
       this.appendDialogueBubble("seller", res.text, "bubble-callback");
@@ -501,7 +517,7 @@ class HaggleApp {
         alert(res.error);
         return;
       }
-      buttonEl.classList.add("used");
+      this.finalizeSkillUse(moveId, buttonEl);
       this.appendDialogueBubble("player", "Wait o, inspect this seam/edge well well. You sure say this material complete?", "bubble-player");
 
       if (res.isBackfire) {
@@ -530,7 +546,7 @@ class HaggleApp {
         alert(res.error);
         return;
       }
-      buttonEl.classList.add("used");
+      this.finalizeSkillUse(moveId, buttonEl);
       sounds.playPhoneRing();
       this.appendDialogueBubble("player", "*(Puts phone to ear)* Hello? Broda, you say the shop for front dey sell this exact one cheaper? Okay I dey come...", "bubble-player");
       setTimeout(() => {
@@ -545,7 +561,7 @@ class HaggleApp {
         alert(res.error);
         return;
       }
-      buttonEl.classList.add("used");
+      this.finalizeSkillUse(moveId, buttonEl);
       sounds.playCashSlap();
       this.appendDialogueBubble("player", "*(Slaps Naira cash notes on the stall table)* See raw cash in my hand. Take am now now or I waka!", "bubble-player");
 
@@ -559,6 +575,31 @@ class HaggleApp {
         this.appendDialogueBubble("seller", res.text, "bubble-insult");
         this.updatePatienceUI();
       }
+    }
+  }
+
+  finalizeSkillUse(moveId, buttonEl) {
+    this.stallSkillUsedThisStore = true;
+    buttonEl.classList.add("used");
+
+    if (this.mode === "campaign") {
+      this.campaignUsedSkills.add(moveId);
+      // In Saturday run: 1 skill per store, so lock all remaining buttons for this store
+      this.tacticButtons.forEach((btn) => {
+        btn.classList.add("used");
+        if (this.campaignUsedSkills.has(btn.dataset.tactic)) {
+          btn.title = "Consumed for this Saturday run";
+        } else {
+          btn.title = "Only 1 skill allowed per store (Available at future stalls)";
+        }
+      });
+      const tacticsTitle = document.querySelector(".tactics-title-row span:first-child");
+      const remainingRunUses = Math.max(0, 4 - this.campaignUsedSkills.size);
+      if (tacticsTitle) {
+        tacticsTitle.textContent = `Street Tactics (1/store used • ${remainingRunUses}/4 left in run)`;
+      }
+    } else {
+      this.tacticButtons.forEach((btn) => btn.classList.add("used"));
     }
   }
 
@@ -651,6 +692,8 @@ class HaggleApp {
 
   setMode(mode) {
     this.mode = mode;
+    this.campaignUsedSkills = new Set();
+    this.stallSkillUsedThisStore = false;
     if (mode === "campaign") {
       this.btnModeCampaign.classList.add("active");
       this.btnModeFree.classList.remove("active");
@@ -695,6 +738,8 @@ class HaggleApp {
       this.renderCampaignBriefing(this.campaignDifficulty);
     }
     this.campaignManager = new CampaignManager(this.currentErrandConfig);
+    this.campaignUsedSkills = new Set();
+    this.stallSkillUsedThisStore = false;
     this.nextStallPatienceBonus = 0;
     this.loadCampaignStep();
   }
@@ -708,17 +753,7 @@ class HaggleApp {
     hazard.options.forEach((opt) => {
       const btn = document.createElement("button");
       btn.className = "hazard-opt-btn";
-
-      let costBadge = "";
-      if (opt.cost > 0) {
-        costBadge = `<span style="color: #f87171; font-weight: 800;">-${NegotiationEngine.formatNaira(opt.cost)}</span>`;
-      } else if (opt.cost < 0) {
-        costBadge = `<span style="color: #34d399; font-weight: 800;">+${NegotiationEngine.formatNaira(Math.abs(opt.cost))}</span>`;
-      } else {
-        costBadge = `<span style="color: #38bdf8; font-weight: 800;">₦0</span>`;
-      }
-
-      btn.innerHTML = `<span>${opt.text}</span> ${costBadge}`;
+      btn.innerHTML = `<span>${opt.text}</span>`;
       btn.addEventListener("click", () => {
         this.roadHazardModal.classList.remove("active");
         this.campaignManager.applyHazardOutcome(opt);
@@ -838,8 +873,33 @@ class HaggleApp {
     this.updateSprites();
     this.rainOverlay.classList.remove("active");
 
-    // Reset Tactics Buttons
-    this.tacticButtons.forEach((b) => b.classList.remove("used"));
+    // Reset Tactics Buttons according to mode & campaign skill usage
+    this.stallSkillUsedThisStore = false;
+    const tacticsTitle = document.querySelector(".tactics-title-row span:first-child");
+    if (this.mode === "campaign") {
+      const remainingRunUses = Math.max(0, 4 - this.campaignUsedSkills.size);
+      if (tacticsTitle) {
+        tacticsTitle.textContent = `Street Tactics (1/store • ${remainingRunUses}/4 left in run)`;
+      }
+      this.tacticButtons.forEach((b) => {
+        const tacticId = b.dataset.tactic;
+        if (this.campaignUsedSkills.has(tacticId)) {
+          b.classList.add("used");
+          b.title = "Consumed for this Saturday run";
+        } else {
+          b.classList.remove("used");
+          b.title = "1 skill allowed this store";
+        }
+      });
+    } else {
+      if (tacticsTitle) {
+        tacticsTitle.textContent = "Street Tactics (1 use/stall)";
+      }
+      this.tacticButtons.forEach((b) => {
+        b.classList.remove("used");
+        b.removeAttribute("title");
+      });
+    }
 
     // Update Left Profile UI
     this.sellerAvatar.textContent = seller.avatar;
