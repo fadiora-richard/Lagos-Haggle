@@ -526,19 +526,19 @@ export const ROAD_HAZARDS = [
     id: "gala_lacasera",
     title: "Third Mainland Bridge Go-Slow!",
     icon: "🥤",
-    desc: "Traffic is crawling at 5km/h. A street hawker taps your bus window holding ice-cold Lacasera and hot Gala for ₦700.",
+    desc: "Traffic is crawling at 5km/h. A street hawker taps your bus window holding ice-cold Lacasera and hot Gala.",
     options: [
       {
-        text: "Buy Cold Drink & Gala (Pay ₦700 from Pocket Money)",
+        text: "Buy Cold Drink & Gala",
         cost: 700,
         effect: "refresh",
         message: "Cold drink refreshed your soul! You arrive at the next market in high spirits (+15 Patience bonus)."
       },
       {
-        text: "Endure the Lagos Heat (Save Your ₦700)",
+        text: "Endure the Lagos Heat",
         cost: 0,
         effect: "none",
-        message: "You wiped sweat with your shirt and saved your ₦700. True street discipline!"
+        message: "You wiped sweat with your shirt. True street discipline (Saved cash)!"
       }
     ]
   },
@@ -589,16 +589,16 @@ export const ROAD_HAZARDS = [
     desc: "The yellow bus breaks down with steam pouring from the hood! Driver shouts: 'Everybody come down make una push!'",
     options: [
       {
-        text: "Take Quick Okada Motorcycle (Pay ₦1,000)",
+        text: "Take Quick Okada Motorcycle",
         cost: 1000,
         effect: "fast_transit",
-        message: "Okada zoomed through Lagos traffic like an arrow! Arrived at the next stall in 3 minutes."
+        message: "Okada zoomed through Lagos traffic like an arrow! (Paid ₦1,000 fare, arrived in 3 minutes)."
       },
       {
-        text: "Help Push the Danfo (Save ₦1,000)",
+        text: "Help Push the Danfo",
         cost: 0,
         effect: "tired",
-        message: "You pushed the bus until it roared back to life. Hands dirty, but ₦1,000 saved!"
+        message: "You pushed the bus until it roared back to life. Hands dirty, but kept your cash!"
       }
     ]
   }
