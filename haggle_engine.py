@@ -1,5 +1,6 @@
 """
-haggle_engine.py - Option B: Python Core Negotiation Logic & Terminal CLI
+haggle_engine.py - Last Price: The Art of the Haggle
+Option B: Python Core Negotiation Logic & Terminal CLI
 
 Use this script to test, simulate, and balance the haggling algorithm
 independently of the browser UI.
@@ -376,6 +377,70 @@ MARKETS_PY = [
     {
         "id": "yaba",
         "name": "Yaba Market (Tejuosho)",
+        "sellers": [
+            Seller(
+                name="Bros Emeka",
+                market="Yaba Market",
+                base_patience=100,
+                patience_loss_per_offer=12,
+                insult_tolerance_ratio=0.65,
+                callback_chance=0.80,
+                insults=[
+                    "Chineke God! Which kind bad morning be this?! You wan close my shop?!",
+                    "Commot for my front! I be your age mate? You think say na dustbin I pick am from?!",
+                    "Mcheww! Dey go find your size for ground floor, don't waste my breath!"
+                ],
+                grumbles=[
+                    "Haba chairman, you wan kill person? Last price na {counter}.",
+                    "Abeg reason with me. Dollar don rise! Last price na {counter}.",
+                    "I get family to feed o! Lowest I fit do na {counter}."
+                ],
+                callbacks=[
+                    "Customer! Hey! Where you dey go? Oya come back! Take am for {counter}!",
+                    "Brother wait! No vex, market na negotiation. Pay {counter} make you carry am!"
+                ]
+            ),
+            Seller(
+                name="Sister Blessing",
+                market="Yaba Market",
+                base_patience=105,
+                patience_loss_per_offer=11,
+                insult_tolerance_ratio=0.62,
+                callback_chance=0.80,
+                insults=[
+                    "Jesus is Lord! Baby boy, with all this your fine face, this na the dry price you dey call?!",
+                    "Ah ah, sweetheart! You wan make I go sleep for street? God forbid that price!"
+                ],
+                grumbles=[
+                    "Baby boy, you tight hand too much! Cargo freight from London killed my profit. Pay {counter}.",
+                    "Sweetheart, abeg have pity on a working girl! The lowest I can drop is {counter}."
+                ],
+                callbacks=[
+                    "Baby boy wait na! Where you dey waka go for hot sun?! Come back, take am for {counter}!",
+                    "Sweetheart! Don't break my heart! Oya come, make we close deal at {counter}!"
+                ]
+            ),
+            Seller(
+                name="Oga Segun",
+                market="Yaba Market",
+                base_patience=95,
+                patience_loss_per_offer=13,
+                insult_tolerance_ratio=0.68,
+                callback_chance=0.72,
+                insults=[
+                    "Chai! General, you dey whine me?! Even the shoe box alone cost pass your offer!",
+                    "Bros, dey play! Which kind gutter valuation be this? Go buy slippers for under bridge!"
+                ],
+                grumbles=[
+                    "Padi mi, dollar rate for importation is choking us. Bottom line na {counter}.",
+                    "Check the stitching well well! Zero flaw. Last last, drop {counter}."
+                ],
+                callbacks=[
+                    "General! Hold on! Where you dey sprint go?! Come back, pay {counter} make we seal am!",
+                    "Padi mi! Don't sleep on this drip! Oya take am for {counter}!"
+                ]
+            )
+        ],
         "seller": Seller(
             name="Bros Emeka",
             market="Yaba Market",
@@ -383,20 +448,9 @@ MARKETS_PY = [
             patience_loss_per_offer=12,
             insult_tolerance_ratio=0.65,
             callback_chance=0.80,
-            insults=[
-                "Chineke God! Which kind bad morning be this?! You wan close my shop?!",
-                "Commot for my front! I be your age mate? You think say na dustbin I pick am from?!",
-                "Mcheww! Dey go find your size for ground floor, don't waste my breath!"
-            ],
-            grumbles=[
-                "Haba chairman, you wan kill person? Last price na {counter}.",
-                "Abeg reason with me. Dollar don rise! Last price na {counter}.",
-                "I get family to feed o! Lowest I fit do na {counter}."
-            ],
-            callbacks=[
-                "Customer! Hey! Where you dey go? Oya come back! Take am for {counter}!",
-                "Brother wait! No vex, market na negotiation. Pay {counter} make you carry am!"
-            ]
+            insults=["Chineke God! Which kind bad morning be this?!"],
+            grumbles=["Haba chairman, last price na {counter}."],
+            callbacks=["Customer! Hey! Where you dey go? Take am for {counter}!"]
         ),
         "items": [
             MarketItem("denim_jacket", "Vintage UK Oversized Denim Jacket", "Grade-1 Okrika from UK bale", 28000, 9000, 13000, is_original=False),
@@ -407,6 +461,70 @@ MARKETS_PY = [
     {
         "id": "balogun",
         "name": "Balogun Island Market",
+        "sellers": [
+            Seller(
+                name="Mama Nkechi",
+                market="Balogun Island",
+                base_patience=110,
+                patience_loss_per_offer=10,
+                insult_tolerance_ratio=0.60,
+                callback_chance=0.85,
+                insults=[
+                    "Mbanu! God forbid! You want to insult my ancestors with this price?!",
+                    "Tufiakwa! Even my younger apprentice will slap your face for this offer!",
+                    "Ewo! Go buy leaf wear if you don't have money for real fabric!"
+                ],
+                grumbles=[
+                    "My handsome child, school fees have gone up! Last price na {counter}.",
+                    "Look at the texture! High grade wax! Last price na {counter}.",
+                    "I am doing you favor because you remind me of my brother. Drop {counter}."
+                ],
+                callbacks=[
+                    "Wait! My child, don't walk into the sun! Come back, take it for {counter}!",
+                    "Customer! Don't go to those fake sellers down the road! Take {counter}!"
+                ]
+            ),
+            Seller(
+                name="Alhaja Kudirat",
+                market="Balogun Island",
+                base_patience=105,
+                patience_loss_per_offer=14,
+                insult_tolerance_ratio=0.66,
+                callback_chance=0.78,
+                insults=[
+                    "Egbami o! Are you abusing my father's lineage with this kind chicken change?!",
+                    "Mo gbe! Look at this child pricing luxury lace like bitterleaf for night market!"
+                ],
+                grumbles=[
+                    "Haba, my child! Even customs clearance at Apapa port cost more than that. Drop {counter}.",
+                    "You want to skin Alhaja alive! Because I like your composure, last price is {counter}."
+                ],
+                callbacks=[
+                    "Wait, my fine child! Don't walk into Lagos Island heat! Come back, take am for {counter}!",
+                    "Ah ah, you are turning back?! Alhaja never lets good customer leave! Come take {counter}!"
+                ]
+            ),
+            Seller(
+                name="Madam Peace",
+                market="Balogun Island",
+                base_patience=95,
+                patience_loss_per_offer=16,
+                insult_tolerance_ratio=0.72,
+                callback_chance=0.70,
+                insults=[
+                    "Chai! Are you insulting Italian weavers or you think this silk na nylon fishing net?!",
+                    "Oga, commot! Don't come and disgrace yourself inside my boutique!"
+                ],
+                grumbles=[
+                    "Customer, pure Euro exchange rate killed importation. Last price na {counter}.",
+                    "I no dey add fake margin. The bottom wholesale rate is {counter}."
+                ],
+                callbacks=[
+                    "Wait! Don't waka out! Market is crowded, come back take am for {counter}!",
+                    "Customer, hold on! You won't find this brocade anywhere on this street! Take {counter}!"
+                ]
+            )
+        ],
         "seller": Seller(
             name="Mama Nkechi",
             market="Balogun Island",
@@ -414,20 +532,9 @@ MARKETS_PY = [
             patience_loss_per_offer=10,
             insult_tolerance_ratio=0.60,
             callback_chance=0.85,
-            insults=[
-                "Mbanu! God forbid! You want to insult my ancestors with this price?!",
-                "Tufiakwa! Even my younger apprentice will slap your face for this offer!",
-                "Ewo! Go buy leaf wear if you don't have money for real fabric!"
-            ],
-            grumbles=[
-                "My handsome child, school fees have gone up! Last price na {counter}.",
-                "Look at the texture! High grade wax! Last price na {counter}.",
-                "I am doing you favor because you remind me of my brother. Drop {counter}."
-            ],
-            callbacks=[
-                "Wait! My child, don't walk into the sun! Come back, take it for {counter}!",
-                "Customer! Don't go to those fake sellers down the road! Take {counter}!"
-            ]
+            insults=["Mbanu! God forbid!"],
+            grumbles=["Last price na {counter}."],
+            callbacks=["Customer! Take {counter}!"]
         ),
         "items": [
             MarketItem("dutch_wax", "6 Yards Real Dutch Wax (Hollandis)", "Authentic wax print, heavy cotton", 42000, 16000, 22000, is_original=True),
@@ -438,6 +545,70 @@ MARKETS_PY = [
     {
         "id": "computer_village",
         "name": "Otigba Computer Village (Ikeja)",
+        "sellers": [
+            Seller(
+                name="Engr. Chidi Tech",
+                market="Computer Village",
+                base_patience=90,
+                patience_loss_per_offer=15,
+                insult_tolerance_ratio=0.75,
+                callback_chance=0.65,
+                insults=[
+                    "Bros, dey play! Charger alone cost pass the money you dey call!",
+                    "Oga shift! Go Otigba bridge go buy refurbished dummy carton!",
+                    "Chai! You want make custom duty swallow my capital?!"
+                ],
+                grumbles=[
+                    "Chief, clearance cost at wharf killed us. Bottom line na {counter}.",
+                    "I give you 6 months receipt guarantee! Last price na {counter}.",
+                    "No be China copy, original follow-come! Drop {counter}."
+                ],
+                callbacks=[
+                    "Chairman hold on! Otigba boys dey tricky. Come back make I give you for {counter}!",
+                    "Boss wait! No enter rain! Take am for {counter}!"
+                ]
+            ),
+            Seller(
+                name="Stanley Chips",
+                market="Computer Village",
+                base_patience=105,
+                patience_loss_per_offer=12,
+                insult_tolerance_ratio=0.70,
+                callback_chance=0.75,
+                insults=[
+                    "Bros, dey play! RAM chip alone for swap market cost pass your whole price!",
+                    "Guy! You wan buy Apple Silicon with calculator budget? Tufiakwa!"
+                ],
+                grumbles=[
+                    "Bossman, original MagSafe and clean thermal paste on top. Last price na {counter}.",
+                    "I don test logic board on multimeter, zero short circuit! Give me {counter}."
+                ],
+                callbacks=[
+                    "Bossman wait! Otigba bridge boys go give you iCloud-locked paperweight! Come pay {counter}!",
+                    "Hold on, tech bro! Don't enter rain, let us settle this specs for {counter}!"
+                ]
+            ),
+            Seller(
+                name="Mama Bose Accessories",
+                market="Computer Village",
+                base_patience=95,
+                patience_loss_per_offer=15,
+                insult_tolerance_ratio=0.65,
+                callback_chance=0.80,
+                insults=[
+                    "Egbami o! Fine boy with empty purse! You wan buy original power bank with gala money?!",
+                    "Holy Ghost! Even the packaging box cost pass this your dry offer!"
+                ],
+                grumbles=[
+                    "My fine customer, real lithium polymer battery heavy o. Bottom price na {counter}.",
+                    "I give you 1 month replacement warranty! Settle for {counter}."
+                ],
+                callbacks=[
+                    "Fine boy! Where you dey run go?! Come back, take am for {counter}!",
+                    "Wait na! NEPA go take light tonight o, you need this battery! Take {counter}!"
+                ]
+            )
+        ],
         "seller": Seller(
             name="Engr. Chidi Tech",
             market="Computer Village",
@@ -445,20 +616,9 @@ MARKETS_PY = [
             patience_loss_per_offer=15,
             insult_tolerance_ratio=0.75,
             callback_chance=0.65,
-            insults=[
-                "Bros, dey play! Charger alone cost pass the money you dey call!",
-                "Oga shift! Go Otigba bridge go buy refurbished dummy carton!",
-                "Chai! You want make custom duty swallow my capital?!"
-            ],
-            grumbles=[
-                "Chief, clearance cost at wharf killed us. Bottom line na {counter}.",
-                "I give you 6 months receipt guarantee! Last price na {counter}.",
-                "No be China copy, original follow-come! Drop {counter}."
-            ],
-            callbacks=[
-                "Chairman hold on! Otigba boys dey tricky. Come back make I give you for {counter}!",
-                "Boss wait! No enter rain! Take am for {counter}!"
-            ]
+            insults=["Bros, dey play!"],
+            grumbles=["Bottom line na {counter}."],
+            callbacks=["Boss wait! Take am for {counter}!"]
         ),
         "items": [
             MarketItem("iphone_12", "iPhone 12 128GB (Factory Unlocked)", "Clean battery health 89%, True Tone active", 185000, 110000, 135000, is_original=True),
@@ -469,6 +629,70 @@ MARKETS_PY = [
     {
         "id": "mile12",
         "name": "Mile 12 Food Market",
+        "sellers": [
+            Seller(
+                name="Alhaji Danladi",
+                market="Mile 12",
+                base_patience=95,
+                patience_loss_per_offer=11,
+                insult_tolerance_ratio=0.62,
+                callback_chance=0.70,
+                insults=[
+                    "Subhanallah! Aboki, are you pricing sweet yam or dry firewood?!",
+                    "Wallahi you want me to incur debt for truck diesel?!",
+                    "Walahi talahi, this your price cannot even pay motor boy!"
+                ],
+                grumbles=[
+                    "Haba oga, fuel price for trailer from Kano is high. Last price na {counter}.",
+                    "Look how fresh! Direct from farm this morning. Pay {counter}.",
+                    "I give you wholesale rate because of market opening. Drop {counter}."
+                ],
+                callbacks=[
+                    "Oga customer! Don't go outside where dust will spoil the food! Take am for {counter}!",
+                    "Chairman wait! Come back make boys tie the bag for you at {counter}!"
+                ]
+            ),
+            Seller(
+                name="Iya Moria",
+                market="Mile 12",
+                base_patience=105,
+                patience_loss_per_offer=13,
+                insult_tolerance_ratio=0.64,
+                callback_chance=0.78,
+                insults=[
+                    "Egbami! Oya pepper scatter for your eyes! You wan buy full raffia basket with pocket money?!",
+                    "Mo gbe! Look at this person pricing trailer goods like sachet water!"
+                ],
+                grumbles=[
+                    "Haba customer, driver collect ₦150k per basket on road! Lowest I fit drop na {counter}.",
+                    "Look as tomato round and solid, no soft rot inside! Bring {counter}."
+                ],
+                callbacks=[
+                    "Customer! Wait na! Don't enter that tomato mud! Come back, take am for {counter}!",
+                    "Ah ah! You dey waka leave fresh Jos tomato?! Oya come take {counter}!"
+                ]
+            ),
+            Seller(
+                name="Mallam Garba",
+                market="Mile 12",
+                base_patience=100,
+                patience_loss_per_offer=10,
+                insult_tolerance_ratio=0.70,
+                callback_chance=0.72,
+                insults=[
+                    "Astaghfirullah! Did you think we grow rice on cloud without diesel and fertilizer?!",
+                    "Haba! Go buy husk and stones if your budget is this low!"
+                ],
+                grumbles=[
+                    "Customer, trailer freight from Kano is ₦800,000 per trip. Bottom price is {counter}.",
+                    "Examine the bag seal! Full 50kg on scale, not re-bagged 42kg. Last price na {counter}."
+                ],
+                callbacks=[
+                    "Customer tsaya! Wait! Don't let transporters cheat you outside! Take {counter}!",
+                    "Hold on, Alhaji! The sun is harsh, come back take am for {counter}!"
+                ]
+            )
+        ],
         "seller": Seller(
             name="Alhaji Danladi",
             market="Mile 12",
@@ -476,20 +700,9 @@ MARKETS_PY = [
             patience_loss_per_offer=11,
             insult_tolerance_ratio=0.62,
             callback_chance=0.70,
-            insults=[
-                "Subhanallah! Aboki, are you pricing sweet yam or dry firewood?!",
-                "Wallahi you want me to incur debt for truck diesel?!",
-                "Walahi talahi, this your price cannot even pay motor boy!"
-            ],
-            grumbles=[
-                "Haba oga, fuel price for trailer from Kano is high. Last price na {counter}.",
-                "Look how fresh! Direct from farm this morning. Pay {counter}.",
-                "I give you wholesale rate because of market opening. Drop {counter}."
-            ],
-            callbacks=[
-                "Oga customer! Don't go outside where dust will spoil the food! Take am for {counter}!",
-                "Chairman wait! Come back make boys tie the bag for you at {counter}!"
-            ]
+            insults=["Subhanallah!"],
+            grumbles=["Last price na {counter}."],
+            callbacks=["Chairman wait! Take am for {counter}!"]
         ),
         "items": [
             MarketItem("yam_tubers", "5 Giant Abuja White Tubers", "Massive, dry, zero rot yams", 30000, 14000, 18000, is_original=True),
@@ -500,6 +713,70 @@ MARKETS_PY = [
     {
         "id": "alaba",
         "name": "Alaba International Market",
+        "sellers": [
+            Seller(
+                name="Chief Uche Power",
+                market="Alaba International",
+                base_patience=100,
+                patience_loss_per_offer=13,
+                insult_tolerance_ratio=0.70,
+                callback_chance=0.75,
+                insults=[
+                    "Chineke Nna! Are you pricing original generator or electric kettle?!",
+                    "Look this boy o! Do you think I picked pure copper coil from gutter?!",
+                    "Commot for my warehouse! Go buy candle if you no get money for light!"
+                ],
+                grumbles=[
+                    "Chairman, dollar to naira at wharf killed us. Bottom line na {counter}.",
+                    "Look the weight! Pure copper coil heavy like rock. Last price na {counter}.",
+                    "I no dey sell fake things here. Drop {counter} make boys load am for your motor."
+                ],
+                callbacks=[
+                    "Chairman! Hold on! Where you dey waka go? Oya come back, take am for {counter}!",
+                    "Chief! Don't go outside to buy aluminum coil wey go burn tomorrow! Take {counter}!"
+                ]
+            ),
+            Seller(
+                name="Bros Kingsley",
+                market="Alaba International",
+                base_patience=105,
+                patience_loss_per_offer=12,
+                insult_tolerance_ratio=0.67,
+                callback_chance=0.76,
+                insults=[
+                    "Chai! Bros, are you pricing pocket radio or 500W RMS sub-bass monster?!",
+                    "Comot for here! That price cannot even buy the speaker magnet!"
+                ],
+                grumbles=[
+                    "Chairman, heavy magnet speaker heavy for freight cost. Bottom price na {counter}.",
+                    "Test the sound quality! Zero distortion at maximum volume. Last price na {counter}."
+                ],
+                callbacks=[
+                    "Sound Master! Wait! Don't walk away from pure bass! Come back, take am for {counter}!",
+                    "Chairman hold on! Those road boys go sell you empty casing! Take this for {counter}!"
+                ]
+            ),
+            Seller(
+                name="Chief Obinna Solar",
+                market="Alaba International",
+                base_patience=100,
+                patience_loss_per_offer=11,
+                insult_tolerance_ratio=0.72,
+                callback_chance=0.74,
+                insults=[
+                    "Chineke! Are you pricing high-voltage copper transformer or car battery charger?!",
+                    "Oga, dey play! German engineering no be toy for child play!"
+                ],
+                grumbles=[
+                    "Distinguished buyer, lithium compatibility and MPPT controller cost real Euro. Last price na {counter}.",
+                    "Pure Sine Wave protect all your delicate electronics. Settle for {counter}."
+                ],
+                callbacks=[
+                    "Distinguished sir! Hold on! Don't go back to darkness! Come back, take am for {counter}!",
+                    "Oga wait! Petrol price is climbing tomorrow, secure your solar for {counter}!"
+                ]
+            )
+        ],
         "seller": Seller(
             name="Chief Uche Power",
             market="Alaba International",
@@ -507,20 +784,9 @@ MARKETS_PY = [
             patience_loss_per_offer=13,
             insult_tolerance_ratio=0.70,
             callback_chance=0.75,
-            insults=[
-                "Chineke Nna! Are you pricing original generator or electric kettle?!",
-                "Look this boy o! Do you think I picked pure copper coil from gutter?!",
-                "Commot for my warehouse! Go buy candle if you no get money for light!"
-            ],
-            grumbles=[
-                "Chairman, dollar to naira at wharf killed us. Bottom line na {counter}.",
-                "Look the weight! Pure copper coil heavy like rock. Last price na {counter}.",
-                "I no dey sell fake things here. Drop {counter} make boys load am for your motor."
-            ],
-            callbacks=[
-                "Chairman! Hold on! Where you dey waka go? Oya come back, take am for {counter}!",
-                "Chief! Don't go outside to buy aluminum coil wey go burn tomorrow! Take {counter}!"
-            ]
+            insults=["Chineke Nna!"],
+            grumbles=["Bottom line na {counter}."],
+            callbacks=["Chief! Take {counter}!"]
         ),
         "items": [
             MarketItem("lutian_gen", "Lutian 3.5kVA Pure Copper Generator", "100% pure copper coil windings", 320000, 195000, 235000, is_original=True),
@@ -893,7 +1159,7 @@ def show_tutorial():
 if __name__ == "__main__":
     while True:
         print("\n" + "=" * 60)
-        print("🇳🇬 LAGOS MARKET HAGGLE SIMULATOR")
+        print("🇳🇬 LAST PRICE: THE ART OF THE HAGGLE")
         print("=" * 60)
         print("Choose Mode:")
         print(f" (1) Free Stall Practice (Quick Haggle) [Drip: {CURRENT_DRIP_PY.name.split(' ')[0]}]")
@@ -904,10 +1170,31 @@ if __name__ == "__main__":
         mode_choice = input("> ").strip().lower()
 
         if mode_choice == "1":
-            test_m = MARKETS_PY[0]
-            test_item = test_m["items"][0]
-            test_seller = test_m["seller"]
-            play_stall(test_item, test_seller, drip=CURRENT_DRIP_PY)
+            print("\nSelect Market:")
+            for m_i, m_obj in enumerate(MARKETS_PY, 1):
+                print(f" ({m_i}) {m_obj['name']}")
+            m_pick = input("> ").strip()
+            sel_m = MARKETS_PY[int(m_pick)-1] if m_pick in ["1","2","3","4","5"] else MARKETS_PY[0]
+
+            print("\nSelect Item:")
+            for it_i, it_obj in enumerate(sel_m["items"], 1):
+                print(f" ({it_i}) {it_obj.name} ({format_naira(it_obj.asking_price)})")
+            it_pick = input("> ").strip()
+            sel_it = sel_m["items"][int(it_pick)-1] if it_pick.isdigit() and 1 <= int(it_pick) <= len(sel_m["items"]) else sel_m["items"][0]
+
+            sellers_list = sel_m.get("sellers", [sel_m["seller"]])
+            s_idx = 0
+            while True:
+                cur_seller = sellers_list[s_idx]
+                success, paid, eval_res = play_stall(sel_it, cur_seller, drip=CURRENT_DRIP_PY)
+                if success:
+                    break
+                s_idx = (s_idx + 1) % len(sellers_list)
+                next_seller = sellers_list[s_idx]
+                print(f"\n🚶 You walked away from {cur_seller.name}'s stall! Moving to {next_seller.name}...")
+                print("Haggle with this next seller? (y/n)")
+                if input("> ").strip().lower() != "y":
+                    break
         elif mode_choice == "2":
             play_campaign()
         elif mode_choice == "3":

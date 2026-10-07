@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lagos Market: The Art of the Haggle</title>
+  <title>Last Price: The Art of the Haggle</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2226%22 font-size=%2228%22>🇳🇬</text></svg>">
 </head>
@@ -13,8 +13,8 @@
     <div class="logo-container">
       <span class="danfo-badge">LAGOS 01</span>
       <div>
-        <h1 style="font-size: 1.15rem; font-weight: 800; line-height: 1.1;">LAGOS HAGGLE</h1>
-        <p style="font-size: 0.72rem; color: var(--text-secondary);">Market Survival & Negotiation Simulator</p>
+        <h1 style="font-size: 1.15rem; font-weight: 800; line-height: 1.1;">LAST PRICE</h1>
+        <p style="font-size: 0.72rem; color: var(--text-secondary);">The Art of the Haggle • Lagos Market Simulator</p>
       </div>
     </div>
 
@@ -111,9 +111,17 @@
 
       <div class="seller-profile">
         <div id="sellerAvatar" class="seller-avatar">👔</div>
-        <div class="seller-info">
-          <h2 id="sellerName">Bros Emeka</h2>
+        <div class="seller-info" style="flex: 1;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+            <h2 id="sellerName">Bros Emeka</h2>
+            <span id="stallBadge" class="stall-badge">Stall 1/3</span>
+          </div>
           <span id="sellerTitle" class="seller-title">Senior Okrika Merchant</span>
+          <div style="margin-top: 0.4rem;">
+            <button id="btnSwitchSeller" class="switch-seller-chip" title="Walk over to the next stall in this market">
+              <span>🚶 Walk to Next Stall</span> ➔
+            </button>
+          </div>
         </div>
       </div>
 
@@ -201,6 +209,17 @@
             <span>💵 Show Cash</span>
             <span style="font-size: 0.65rem; color: #f43f5e;">Instant Close</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Contextual Street Haggle Dialogue Options -->
+      <div class="haggle-dialogue-box">
+        <div class="haggle-dialogue-header">
+          <span>🗣️ Street Haggle Dialogue</span>
+          <span class="dialogue-header-badge">Item & Market Banter</span>
+        </div>
+        <div id="haggleDialogueList" class="haggle-dialogue-list">
+          <!-- Dynamically populated per item & market -->
         </div>
       </div>
 
@@ -297,7 +316,7 @@
           Turn Around & Pay <span id="callbackPriceTag">₦10,000</span>
         </button>
         <button id="btnRejectCallback" class="btn-walk-away" style="flex: 1; padding: 0.85rem;">
-          Keep Walking (Leave Shop)
+          🚶 Keep Walking (Next Seller)
         </button>
       </div>
     </div>
@@ -312,7 +331,10 @@
         The seller got tired of the drama and showed you the road. No market today!
       </p>
 
-      <button id="btnLossRetry" class="btn-restart">Try Another Stall</button>
+      <div style="display: flex; gap: 0.75rem; width: 100%;">
+        <button id="btnLossRetry" class="btn-restart" style="flex: 1; margin-top: 0;">Retry This Stall</button>
+        <button id="btnLossWalkNext" class="btn-walk-away" style="flex: 1; padding: 0.85rem; font-weight: 700;">🚶 Walk to Next Seller</button>
+      </div>
     </div>
   </div>
 

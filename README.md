@@ -1,4 +1,4 @@
-# 🇳🇬 Lagos Market: The Art of the Haggle
+# 🇳🇬 Last Price: The Art of the Haggle
 
 An authentic negotiation and street survival game inspired by life in Lagos markets (Yaba, Balogun, Computer Village, Mile 12, and Alaba International) and the EA FC Transfer Market negotiation system.
 
@@ -34,12 +34,39 @@ Click **📖 How to Play** in the header (or select Option 3 in the CLI) to acce
 
 ---
 
-## 🏬 5 Lagos Markets & Sellers
-1. **Yaba Market (Tejuosho)** — *Bros Emeka* (Thrift & okrika specialist).
-2. **Balogun Island Market** — *Mama Nkechi* (Fabric matriarch & lace queen).
-3. **Otigba Computer Village (Ikeja)** — *Engr. Chidi Tech* (Fast-talking gadget dealer).
-4. **Mile 12 Food Market** — *Alhaji Danladi* (Bulk foodstuff, sweet Abuja yams & Jos tomatoes).
-5. **Alaba International (Ojo)** — *Chief Uche Power* (Pure copper generators & electronics mega-lord).
+## 🏬 5 Lagos Markets & 15 Unique Sellers
+1. **Yaba Market (Tejuosho)**:
+   * *Bros Emeka* (Senior Okrika Merchant, thrift & UK bale specialist) 👔
+   * *Sister Blessing* (Vintage Thrift Princess, boutique curator & style connoisseur) 🥻
+   * *Oga Segun* (Tejuosho Sneaker Plug, kicks & street footwear connoisseur) 🧢
+2. **Balogun Island Market**:
+   * *Mama Nkechi* (Fabric Empress of Balogun, maternal guilt trips & lace queen) 🧕🏾
+   * *Alhaja Kudirat* (Lace & Gele Matriarch, high-society Owanbe party lace dealer) 👑
+   * *Madam Peace* (Balogun Silk & Brocade Plug, sharp raw silk yardstick authority) 🧣
+3. **Otigba Computer Village (Ikeja)**:
+   * *Engr. Chidi Tech* (Hardware Alchemist & iPhone plug, clean IMEI guru) 👨🏾‍💻
+   * *Stanley Chips* (Otigba Mac & Laptop Whiz, logic board specs & benchmarks) 💻
+   * *Mama Bose Accessories* (Otigba Gadget & Audio Queen, fast chargers & ANC pods) 🎧
+4. **Mile 12 Food Market**:
+   * *Alhaji Danladi* (Yam & Agricultural Commodity King, dry Abuja yams) 👳🏾‍♂️
+   * *Iya Moria* (Pepper & Tomato Wholesale Titan, Plateau state Jos baskets) 🌶️
+   * *Mallam Garba* (Kano Grains & Rice Merchant, stone-free 50kg wholesale sacks) 🌾
+5. **Alaba International (Ojo)**:
+   * *Chief Uche Power* (Alaba Electronics Mega-Lord, pure copper coil generators) 🤴🏾
+   * *Bros Kingsley* (Sound System & Boombox Don, subwoofer bass specialist) 🔊
+   * *Chief Obinna Solar* (Solar Inverter & Pure Sine Wave Mogul, green power boss) ⚡
+
+### 🚶 Dynamic Walkaway & Stall-Hopping
+Walking away in a Lagos market is a strategic street maneuver:
+* **The Callback**: The current seller might chase you down with an aggressive discount.
+* **Stall Hopping**: If you reject the callback or if a seller exhausts patience, you transition dynamically to a **different rival seller** in that market! The new seller notices your walkout and pitches a competitive deal!
+* **Stall Navigator**: Switch or browse stalls directly at any time via the *🚶 Walk to Next Stall* button.
+
+### 🗣️ Item & Market Contextual Dialogue Options
+Every item across all 5 markets comes with tailored, authentic Nigerian street dialogue options:
+* Challenge specific authenticity markers (collar fade, 3uTools battery health, yam hollow tap, generator copper multimeter tests, lace border threading).
+* Leverage market context (Tejuosho rail boys, Apapa wharf customs, Otigba motherboard engineers, Mile 12 trailer surpluses, Alaba warehouse prices).
+* Instant counter-offer calculations and personalized seller responses!
 
 ---
 

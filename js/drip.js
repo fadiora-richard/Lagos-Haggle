@@ -215,12 +215,31 @@ export class DripManager {
     if (sellerType === "Mama Nkechi") {
       skin = "#522e14";
       clothColor = "#059669";
-      // Big dramatic gele head-tie
+      // Big dramatic emerald gele head-tie
       hat = `
         <ellipse cx="60" cy="18" rx="34" ry="16" fill="#10b981" />
         <ellipse cx="60" cy="12" rx="26" ry="12" fill="#34d399" />
         <circle cx="28" cy="34" r="5" fill="#facc15" />
         <circle cx="92" cy="34" r="5" fill="#facc15" />
+      `;
+    } else if (sellerType === "Alhaja Kudirat") {
+      skin = "#45220d";
+      clothColor = "#7e22ce";
+      // Royal purple & gold gele with ornate gold necklace
+      hat = `
+        <ellipse cx="60" cy="16" rx="36" ry="18" fill="#9333ea" />
+        <ellipse cx="60" cy="10" rx="28" ry="14" fill="#eab308" />
+        <circle cx="60" cy="53" r="4.5" fill="#facc15" />
+        <circle cx="50" cy="51" r="3.5" fill="#facc15" />
+        <circle cx="70" cy="51" r="3.5" fill="#facc15" />
+      `;
+    } else if (sellerType === "Madam Peace") {
+      skin = "#5a3118";
+      clothColor = "#0d9488";
+      // Teal silk wrap with silk scarf
+      hat = `
+        <ellipse cx="60" cy="20" rx="28" ry="12" fill="#14b8a6" />
+        <path d="M 40 54 Q 60 70 80 54" stroke="#fef08a" stroke-width="4" fill="none" />
       `;
     } else if (sellerType === "Engr. Chidi Tech") {
       skin = "#784724";
@@ -231,6 +250,26 @@ export class DripManager {
         <rect x="63" y="28" width="15" height="10" rx="2" fill="none" stroke="#fff" stroke-width="2" />
         <line x1="57" y1="33" x2="63" y2="33" stroke="#fff" stroke-width="2" />
       `;
+    } else if (sellerType === "Stanley Chips") {
+      skin = "#683b1c";
+      clothColor = "#1e1e2e";
+      // Developer glasses and dark tech hoodie
+      hat = `
+        <circle cx="48" cy="32" r="7" fill="none" stroke="#38bdf8" stroke-width="2" />
+        <circle cx="72" cy="32" r="7" fill="none" stroke="#38bdf8" stroke-width="2" />
+        <line x1="55" y1="32" x2="65" y2="32" stroke="#38bdf8" stroke-width="2" />
+        <path d="M 34 22 Q 60 12 86 22 L 88 30 L 32 30 Z" fill="#312e81" />
+      `;
+    } else if (sellerType === "Mama Bose Accessories") {
+      skin = "#4c260f";
+      clothColor = "#ea580c";
+      // Bright orange outfit with big DJ headphones around neck
+      hat = `
+        <ellipse cx="60" cy="20" rx="30" ry="12" fill="#fb923c" />
+        <path d="M 36 52 Q 60 76 84 52" stroke="#facc15" stroke-width="6" stroke-linecap="round" fill="none" />
+        <circle cx="34" cy="52" r="6" fill="#111827" />
+        <circle cx="86" cy="52" r="6" fill="#111827" />
+      `;
     } else if (sellerType === "Alhaji Danladi") {
       skin = "#6b3c1b";
       clothColor = "#f8fafc";
@@ -240,6 +279,22 @@ export class DripManager {
         <circle cx="60" cy="18" r="3" fill="#fef08a" />
         <line x1="42" y1="24" x2="78" y2="24" stroke="#fef08a" stroke-width="1.5" />
       `;
+    } else if (sellerType === "Iya Moria") {
+      skin = "#562c12";
+      clothColor = "#b91c1c";
+      // Vibrant tomato-red adire wrap with white market apron
+      hat = `
+        <ellipse cx="60" cy="16" rx="34" ry="16" fill="#ef4444" />
+        <ellipse cx="60" cy="11" rx="26" ry="10" fill="#fca5a5" />
+        <rect x="42" y="66" width="36" height="34" rx="4" fill="#f8fafc" />
+      `;
+    } else if (sellerType === "Mallam Garba") {
+      skin = "#613619";
+      clothColor = "#312e81";
+      // Indigo northern babanriga with white prayer kufi
+      hat = `
+        <ellipse cx="60" cy="20" rx="24" ry="10" fill="#f8fafc" />
+      `;
     } else if (sellerType === "Chief Uche Power") {
       skin = "#5e3215";
       clothColor = "#e2e8f0";
@@ -247,10 +302,48 @@ export class DripManager {
       hat = `
         <path d="M 38 20 Q 60 10 82 20 L 84 28 L 36 28 Z" fill="#b91c1c" />
         <path d="M 44 20 Q 32 5 28 0" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" fill="none" />
-        <!-- Coral bead necklace -->
         <circle cx="50" cy="52" r="3.5" fill="#ef4444" />
         <circle cx="60" cy="54" r="3.5" fill="#ef4444" />
         <circle cx="70" cy="52" r="3.5" fill="#ef4444" />
+      `;
+    } else if (sellerType === "Bros Kingsley") {
+      skin = "#663b1d";
+      clothColor = "#4338ca";
+      // Sound master headphones and silver chain
+      hat = `
+        <path d="M 36 22 Q 60 10 84 22 L 86 28 L 34 28 Z" fill="#0f172a" />
+        <path d="M 34 32 Q 60 14 86 32" stroke="#6366f1" stroke-width="4" fill="none" />
+        <circle cx="34" cy="34" r="6" fill="#4f46e5" />
+        <circle cx="86" cy="34" r="6" fill="#4f46e5" />
+        <circle cx="60" cy="54" r="4" fill="#e2e8f0" />
+      `;
+    } else if (sellerType === "Chief Obinna Solar") {
+      skin = "#532a13";
+      clothColor = "#ca8a04";
+      // Gold solar embroidered robe with golden frames
+      hat = `
+        <ellipse cx="60" cy="18" rx="26" ry="12" fill="#a16207" />
+        <rect x="44" y="28" width="13" height="9" rx="2" fill="none" stroke="#facc15" stroke-width="1.8" />
+        <rect x="63" y="28" width="13" height="9" rx="2" fill="none" stroke="#facc15" stroke-width="1.8" />
+        <line x1="57" y1="32" x2="63" y2="32" stroke="#facc15" stroke-width="1.8" />
+      `;
+    } else if (sellerType === "Sister Blessing") {
+      skin = "#6c3e1e";
+      clothColor = "#db2777";
+      // Trendy pink blouse with retro cat-eye sunglasses
+      hat = `
+        <ellipse cx="60" cy="18" rx="28" ry="12" fill="#f43f5e" />
+        <path d="M 40 30 L 52 30 L 48 35 Z" fill="#111" />
+        <path d="M 68 30 L 80 30 L 72 35 Z" fill="#111" />
+        <line x1="52" y1="30" x2="68" y2="30" stroke="#111" stroke-width="2" />
+      `;
+    } else if (sellerType === "Oga Segun") {
+      skin = "#633719";
+      clothColor = "#0284c7";
+      // Backwards streetwear cap & sneaker chain
+      hat = `
+        <path d="M 34 22 Q 60 12 86 22 L 96 22 L 86 28 L 34 28 Z" fill="#0369a1" />
+        <circle cx="60" cy="54" r="3.5" fill="#f59e0b" />
       `;
     } else {
       // Bros Emeka: Okrika cap and tape measure around neck

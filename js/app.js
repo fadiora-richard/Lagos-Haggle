@@ -18,6 +18,7 @@ class HaggleApp {
     this.campaignUsedSkills = new Set(); // Skills consumed across entire Saturday run (max 4)
     this.stallSkillUsedThisStore = false; // Only 1 skill per store
     this.currentMarketIndex = 0;
+    this.currentSellerIndex = 0;
     this.currentItemIndex = 0;
     this.engine = null;
     this.currentTutorialStep = 0;
@@ -85,6 +86,8 @@ class HaggleApp {
     this.sellerAvatar = document.getElementById("sellerAvatar");
     this.sellerName = document.getElementById("sellerName");
     this.sellerTitle = document.getElementById("sellerTitle");
+    this.stallBadge = document.getElementById("stallBadge");
+    this.btnSwitchSeller = document.getElementById("btnSwitchSeller");
     this.patienceBarFill = document.getElementById("patienceBarFill");
     this.patiencePercentText = document.getElementById("patiencePercentText");
     this.itemSelectDropdown = document.getElementById("itemSelectDropdown");
@@ -97,6 +100,7 @@ class HaggleApp {
     // Right Column Arena & Tactics
     this.dialogueContainer = document.getElementById("dialogueContainer");
     this.statusBadge = document.getElementById("statusBadge");
+    this.haggleDialogueList = document.getElementById("haggleDialogueList");
     this.tacticButtons = document.querySelectorAll(".tactic-btn");
     this.offerForm = document.getElementById("offerForm");
     this.offerInput = document.getElementById("offerInput");
@@ -131,6 +135,7 @@ class HaggleApp {
     this.lossTitle = document.getElementById("lossTitle");
     this.lossMessage = document.getElementById("lossMessage");
     this.btnLossRetry = document.getElementById("btnLossRetry");
+    this.btnLossWalkNext = document.getElementById("btnLossWalkNext");
 
     // Campaign Modals & Elements
     this.campaignIntroModal = document.getElementById("campaignIntroModal");
@@ -352,7 +357,7 @@ class HaggleApp {
     this.btnRejectCallback.addEventListener("click", () => {
       this.callbackModal.classList.remove("active");
       sounds.playWalkoutSad();
-      this.showLossModal("You Walked Away Clean!", "You stood your ground and walked into the crowd. Your money stays in your pocket.");
+      this.walkToNextSeller("You rejected the callback and walked over to another stall!");
     });
 
     // Play Again / Next Errand Button in EAFC Grade Modal
@@ -381,6 +386,19 @@ class HaggleApp {
       this.lossModal.classList.remove("active");
       this.startSession();
     });
+
+    if (this.btnLossWalkNext) {
+      this.btnLossWalkNext.addEventListener("click", () => {
+        this.lossModal.classList.remove("active");
+        this.walkToNextSeller("You walked away to the next stall!");
+      });
+    }
+
+    if (this.btnSwitchSeller) {
+      this.btnSwitchSeller.addEventListener("click", () => {
+        this.walkToNextSeller("Switched to the next stall!");
+      });
+    }
   }
 
   openTutorial(step = 0) {
@@ -476,11 +494,39 @@ class HaggleApp {
     });
   }
 
-  updateSprites() {
+  getCurrentSeller() {
     const market = MARKETS[this.currentMarketIndex];
+    if (market.sellers && market.sellers.length > 0) {
+      if (this.currentSellerIndex >= market.sellers.length) {
+        this.currentSellerIndex = 0;
+      }
+      return market.sellers[this.currentSellerIndex];
+    }
+    return market.seller;
+  }
+
+  walkToNextSeller(reason = "") {
+    if (this.lossModal) this.lossModal.classList.remove("active");
+    if (this.callbackModal) this.callbackModal.classList.remove("active");
+
+    const market = MARKETS[this.currentMarketIndex];
+    const prevSeller = this.getCurrentSeller();
+    const sellers = market.sellers || [market.seller];
+    this.currentSellerIndex = (this.currentSellerIndex + 1) % sellers.length;
+    const nextSeller = this.getCurrentSeller();
+
+    const toastMsg = `🚶 Left ${prevSeller.name}! Approaching ${nextSeller.name}'s stall at ${market.name}...`;
+    this.showTransitToast(toastMsg);
+    sounds.playCounterPop();
+
+    this.startSession({ isNewSeller: true, prevSellerName: prevSeller.name });
+  }
+
+  updateSprites() {
+    const seller = this.getCurrentSeller();
     this.playerSpriteSvg.innerHTML = dripManager.renderPlayerSvg();
-    this.sellerSpriteSvg.innerHTML = dripManager.renderSellerSvg(market.seller.name);
-    this.sellerSpriteLabel.textContent = market.seller.name.split(" ")[0].toUpperCase();
+    this.sellerSpriteSvg.innerHTML = dripManager.renderSellerSvg(seller.name);
+    this.sellerSpriteLabel.textContent = seller.name.split(" ")[0].toUpperCase();
   }
 
   handleSpecialMove(moveId, buttonEl) {
@@ -500,6 +546,8 @@ class HaggleApp {
       }
     }
 
+    const item = MARKETS[this.currentMarketIndex].items[this.currentItemIndex];
+
     if (moveId === "sweet_talk") {
       const res = this.engine.useSpecialMove("sweet_talk");
       if (res.error) {
@@ -508,7 +556,8 @@ class HaggleApp {
       }
       this.finalizeSkillUse(moveId, buttonEl);
       sounds.playSweetTalk();
-      this.appendDialogueBubble("player", "Chairman/Mama! Your face dey shine today! God go bless your market well well!", "bubble-player");
+      const sweetSpeech = item.dialogue?.tactics?.sweet_talk?.playerText || "Chairman/Mama! Your face dey shine today! God go bless your market well well!";
+      this.appendDialogueBubble("player", sweetSpeech, "bubble-player");
       this.appendDialogueBubble("seller", res.text, "bubble-callback");
       this.updatePatienceUI();
     } else if (moveId === "fault_find") {
@@ -518,7 +567,8 @@ class HaggleApp {
         return;
       }
       this.finalizeSkillUse(moveId, buttonEl);
-      this.appendDialogueBubble("player", "Wait o, inspect this seam/edge well well. You sure say this material complete?", "bubble-player");
+      const faultSpeech = item.dialogue?.tactics?.fault_find?.playerText || `Wait o, let me inspect this ${item.name} well well. You sure say everything complete?`;
+      this.appendDialogueBubble("player", faultSpeech, "bubble-player");
 
       if (res.isBackfire) {
         sounds.playInsultBuzz();
@@ -548,7 +598,8 @@ class HaggleApp {
       }
       this.finalizeSkillUse(moveId, buttonEl);
       sounds.playPhoneRing();
-      this.appendDialogueBubble("player", "*(Puts phone to ear)* Hello? Broda, you say the shop for front dey sell this exact one cheaper? Okay I dey come...", "bubble-player");
+      const fakeCallSpeech = item.dialogue?.tactics?.fake_call?.playerText || `*(Puts phone to ear)* Hello? Broda, you say the shop for front dey sell this ${item.name} cheaper? Okay I dey come...`;
+      this.appendDialogueBubble("player", fakeCallSpeech, "bubble-player");
       setTimeout(() => {
         sounds.playCounterPop();
         this.appendDialogueBubble("seller", res.text, "bubble-callback");
@@ -563,7 +614,8 @@ class HaggleApp {
       }
       this.finalizeSkillUse(moveId, buttonEl);
       sounds.playCashSlap();
-      this.appendDialogueBubble("player", "*(Slaps Naira cash notes on the stall table)* See raw cash in my hand. Take am now now or I waka!", "bubble-player");
+      const cashSpeech = item.dialogue?.tactics?.show_cash?.playerText || `*(Slaps Naira cash notes on the stall table)* See raw cash in my hand. Take am for this ${item.name} now now or I waka!`;
+      this.appendDialogueBubble("player", cashSpeech, "bubble-player");
 
       if (res.agreed) {
         sounds.playCoinSound();
@@ -791,6 +843,7 @@ class HaggleApp {
     const mIdx = MARKETS.findIndex((m) => m.id === quest.marketId);
     if (mIdx !== -1) {
       this.currentMarketIndex = mIdx;
+      this.currentSellerIndex = 0;
       const iIdx = MARKETS[mIdx].items.findIndex((it) => it.id === quest.itemId);
       this.currentItemIndex = iIdx !== -1 ? iIdx : 0;
     }
@@ -841,6 +894,7 @@ class HaggleApp {
       btn.addEventListener("click", () => {
         if (this.currentMarketIndex !== idx) {
           this.currentMarketIndex = idx;
+          this.currentSellerIndex = 0;
           this.currentItemIndex = 0;
           this.renderMarketTabs();
           this.startSession();
@@ -850,10 +904,16 @@ class HaggleApp {
     });
   }
 
-  startSession() {
+  startSession(options = {}) {
     const market = MARKETS[this.currentMarketIndex];
-    const seller = market.seller;
+    const seller = this.getCurrentSeller();
     const item = market.items[this.currentItemIndex];
+
+    // Update stall badge
+    const sellers = market.sellers || [market.seller];
+    if (this.stallBadge) {
+      this.stallBadge.textContent = `Stall ${this.currentSellerIndex + 1}/${sellers.length}`;
+    }
 
     // Populate dropdown options
     this.itemSelectDropdown.innerHTML = market.items
@@ -872,6 +932,9 @@ class HaggleApp {
     // Update 2D Sprites
     this.updateSprites();
     this.rainOverlay.classList.remove("active");
+
+    // Render Haggle Dialogue Options for this item & market
+    this.renderHaggleDialogueOptions(item);
 
     // Reset Tactics Buttons according to mode & campaign skill usage
     this.stallSkillUsedThisStore = false;
@@ -911,13 +974,14 @@ class HaggleApp {
     this.itemDesc.textContent = item.desc;
     const authBadge = document.getElementById("itemAuthenticityBadge");
     if (authBadge) {
-      if (item.isOriginal) {
-        authBadge.textContent = "★ CERTIFIED ORIGINAL MATERIAL";
-        authBadge.style.color = "#f59e0b";
+      if (item.authBadgeText) {
+        authBadge.textContent = item.authBadgeText;
+      } else if (item.isOriginal) {
+        authBadge.textContent = "★ CERTIFIED 100% ORIGINAL";
       } else {
-        authBadge.textContent = "GRADE REPLICA / BALE THRIFT";
-        authBadge.style.color = "#94a3b8";
+        authBadge.textContent = "GRADE REPLICA / THRIFT";
       }
+      authBadge.style.color = item.isOriginal ? "#f59e0b" : "#94a3b8";
     }
     this.askingPriceDisplay.textContent = NegotiationEngine.formatNaira(this.engine.currentSellerPrice);
     this.btnAcceptPriceText.textContent = NegotiationEngine.formatNaira(this.engine.currentSellerPrice);
@@ -929,20 +993,121 @@ class HaggleApp {
     this.statusBadge.style.background = "rgba(16, 185, 129, 0.2)";
     this.statusBadge.style.color = "#34d399";
 
-    // Initial seller greeting (shows bias if dressed like IJGB)
-    let greeting = seller.dialogue.greetings[Math.floor(Math.random() * seller.dialogue.greetings.length)];
-    if (dripManager.currentPreset.id === "ijgb") {
-      greeting = "Ah ah! Dollar guy don land! Clean sneakers, iPhone! My boss, enter inside!";
+    // Initial seller greeting (shows bias if dressed like IJGB or arriving from rival seller)
+    let greeting = "";
+    if (options.isNewSeller && options.prevSellerName) {
+      greeting = `Customer, enter my stall! I see say you just waka commot from ${options.prevSellerName} side. No mind am, I get better deal on this ${item.name}!`;
+    } else if (dripManager.currentPreset.id === "ijgb") {
+      greeting = `Ah ah! Dollar guy don land! Clean sneakers, iPhone! My boss, step inside, I get proper ${item.name} for you!`;
     } else if (dripManager.currentPreset.id === "market_soldier") {
-      greeting = "Senior man! I see say you be street guy, no long talk.";
+      greeting = `Senior man! I see say you be street guy, no long talk on this ${item.name}.`;
+    } else if (item.dialogue?.greetings && item.dialogue.greetings.length > 0) {
+      greeting = item.dialogue.greetings[Math.floor(Math.random() * item.dialogue.greetings.length)];
+    } else {
+      greeting = seller.dialogue.greetings[Math.floor(Math.random() * seller.dialogue.greetings.length)];
     }
 
-    this.appendDialogueBubble("seller", `${greeting} This ${item.name} na ${NegotiationEngine.formatNaira(this.engine.currentSellerPrice)}. How you see am?`);
+    const formattedOpening = NegotiationEngine.formatNaira(this.engine.currentSellerPrice);
+    let initialSpeech = greeting
+      .replace(/{price}/g, formattedOpening)
+      .replace(/{counter}/g, formattedOpening);
+
+    if (!initialSpeech.includes("₦") && !initialSpeech.includes(formattedOpening)) {
+      initialSpeech = `${initialSpeech} This ${item.name} na ${formattedOpening}. How you see am?`;
+    }
+
+    this.appendDialogueBubble("seller", initialSpeech);
 
     this.updatePatienceUI();
     this.offerInput.value = "";
     this.offerInput.placeholder = `E.g. 10k, 12,000, 15000...`;
     this.updateOfferPreview();
+  }
+
+  renderHaggleDialogueOptions(item) {
+    if (!this.haggleDialogueList) return;
+    this.haggleDialogueList.innerHTML = "";
+    const dialogues = item.haggleDialogues || [];
+    if (!dialogues.length) {
+      this.haggleDialogueList.innerHTML = `<span style="font-size:0.75rem; color:#64748b; font-style:italic;">No custom street banter options for this item.</span>`;
+      return;
+    }
+
+    const currentPrice = this.engine ? this.engine.currentSellerPrice : item.askingPrice;
+
+    dialogues.forEach((dlg) => {
+      const btn = document.createElement("button");
+      btn.className = "haggle-dialogue-btn";
+      const targetOffer = Math.max(
+        Math.round(item.floorPrice * 1.05),
+        Math.round((currentPrice * (1 - (dlg.discountPct || 0.40))) / 500) * 500
+      );
+      const formattedOffer = NegotiationEngine.formatNaira(targetOffer);
+      const quoteText = dlg.playerText.replace("{price}", formattedOffer);
+
+      btn.innerHTML = `
+        <div class="haggle-btn-title">
+          <span>${dlg.label}</span>
+          <span style="color: #10b981; font-size: 0.76rem; font-weight: 800;">${formattedOffer}</span>
+        </div>
+        <div class="haggle-btn-quote">"${quoteText}"</div>
+      `;
+
+      btn.addEventListener("click", () => {
+        if (!this.engine || this.engine.status !== "negotiating") return;
+        btn.classList.add("used");
+        this.offerInput.value = targetOffer;
+        this.handleDialogueOffer(targetOffer, quoteText, dlg.sellerResponse);
+      });
+
+      this.haggleDialogueList.appendChild(btn);
+    });
+  }
+
+  handleDialogueOffer(offerAmount, playerSpeech, customSellerResponse) {
+    this.appendDialogueBubble("player", playerSpeech, "bubble-player");
+
+    const res = this.engine.submitOffer(offerAmount);
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
+
+    this.roundsCountDisplay.textContent = this.engine.rounds;
+    this.updatePatienceUI();
+
+    if (res.action === "insult") {
+      sounds.playInsultBuzz();
+      this.appendDialogueBubble("seller", res.text, "bubble-insult");
+    } else if (res.action === "counter") {
+      sounds.playCounterPop();
+      this.askingPriceDisplay.textContent = NegotiationEngine.formatNaira(res.sellerPrice);
+      this.btnAcceptPriceText.textContent = NegotiationEngine.formatNaira(res.sellerPrice);
+
+      let reply = res.text;
+      if (customSellerResponse) {
+        reply = customSellerResponse.replace("{counter}", NegotiationEngine.formatNaira(res.sellerPrice));
+      }
+      this.appendDialogueBubble("seller", reply);
+
+      // Re-render remaining dialogue option prices against the new counter
+      const currentItem = MARKETS[this.currentMarketIndex].items[this.currentItemIndex];
+      this.renderHaggleDialogueOptions(currentItem);
+
+      const chaos = this.engine.checkRandomChaos();
+      if (chaos) {
+        this.triggerChaosEvent(chaos);
+      }
+    } else if (res.action === "agreed") {
+      sounds.playCoinSound();
+      this.askingPriceDisplay.textContent = NegotiationEngine.formatNaira(res.sellerPrice);
+      this.appendDialogueBubble("seller", res.text);
+      this.showEafcGrade();
+    } else if (res.action === "lost") {
+      sounds.playWalkoutSad();
+      this.appendDialogueBubble("seller", res.text, "bubble-insult");
+      this.showLossModal("Patience Exhausted!", "The seller gave you hot advice and kicked you out! Walk to the next stall down the road.");
+    }
   }
 
   handleOffer(offerAmount) {
@@ -952,8 +1117,16 @@ class HaggleApp {
       return;
     }
 
-    // Append Player Speech
-    this.appendDialogueBubble("player", `Oga, I go pay ${NegotiationEngine.formatNaira(offerAmount)} for this.`);
+    // Append Player Speech (strictly item-specific)
+    const currentItem = MARKETS[this.currentMarketIndex].items[this.currentItemIndex];
+    let playerSpeech = `Oga, I go pay ${NegotiationEngine.formatNaira(offerAmount)} for this ${currentItem.name}.`;
+    if (currentItem.dialogue?.playerOfferLines && currentItem.dialogue.playerOfferLines.length > 0) {
+      const pool = currentItem.dialogue.playerOfferLines;
+      playerSpeech = pool[Math.floor(Math.random() * pool.length)]
+        .replace(/{offer}/g, NegotiationEngine.formatNaira(offerAmount))
+        .replace(/{price}/g, NegotiationEngine.formatNaira(offerAmount));
+    }
+    this.appendDialogueBubble("player", playerSpeech);
 
     // Update Displays
     this.roundsCountDisplay.textContent = this.engine.rounds;
@@ -967,6 +1140,9 @@ class HaggleApp {
       this.askingPriceDisplay.textContent = NegotiationEngine.formatNaira(res.sellerPrice);
       this.btnAcceptPriceText.textContent = NegotiationEngine.formatNaira(res.sellerPrice);
       this.appendDialogueBubble("seller", res.text);
+
+      // Re-render dialogue option prices
+      this.renderHaggleDialogueOptions(currentItem);
 
       // Check for Lagos Market Chaos Event!
       const chaos = this.engine.checkRandomChaos();
@@ -986,7 +1162,10 @@ class HaggleApp {
   }
 
   handleWalkAway() {
-    this.appendDialogueBubble("player", "E cost abeg. I dey waka pass.");
+    const currentItem = MARKETS[this.currentMarketIndex].items[this.currentItemIndex];
+    const walkSpeech = currentItem.dialogue?.playerWalkAway ||
+      `This ${currentItem.name} cost pass my pocket abeg. I dey waka pass.`;
+    this.appendDialogueBubble("player", walkSpeech);
     const res = this.engine.walkAway();
 
     if (res.calledBack) {
@@ -1002,7 +1181,10 @@ class HaggleApp {
     } else {
       sounds.playWalkoutSad();
       this.appendDialogueBubble("seller", res.text);
-      this.showLossModal("You Walked Away!", res.text);
+      this.showLossModal("You Walked Away!", `${res.text} Walking over to another stall...`);
+      setTimeout(() => {
+        this.walkToNextSeller("You walked away from the stall.");
+      }, 1400);
     }
   }
 

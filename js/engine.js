@@ -406,18 +406,18 @@ export class NegotiationEngine {
     }
     this.usedSpecialMoves.add(moveId);
 
+    const itemTactics = this.item?.dialogue?.tactics?.[moveId];
+
     if (moveId === "sweet_talk") {
       const gain = this.dripPreset?.stats?.sweetTalkGain || 22;
       this.patience = Math.min(100, this.patience + gain);
-      let text = "Chairman! You get sweet mouth die! You understand street respect!";
+      let text = itemTactics?.sellerResponse || "Chairman! You get sweet mouth die! You understand street respect!";
       if (this.dripPreset?.id === "student") {
         text = this.seller.name.includes("Mama")
           ? "Aww, my handsome student son! I know say life hard for campus, take am easy!"
           : "Student boy! Your sweet mouth don save you! I don cool down!";
       } else if (this.dripPreset?.id === "ijgb") {
         text = "Bros, which kind phoneh / foreign accent be this? Speak proper street Pidgin jare! But no wahala!";
-      } else if (this.seller.name.includes("Mama")) {
-        text = "Aww, my handsome child! You have home training. You talk like my own brother!";
       }
       return {
         action: "sweet_talk",
@@ -435,16 +435,9 @@ export class NegotiationEngine {
         const patienceLoss = Math.round(25 / this.patienceShield);
         this.patience = Math.max(0, this.patience - patienceLoss);
 
-        let insultQuote = `God forbid! You dey find fault inside genuine original ${this.item.name}?! Because you disrespect my quality, the price don climb to ${NegotiationEngine.formatNaira(this.currentSellerPrice)}! Buy am or waka pass!`;
-        if (this.seller.name.includes("Mama")) {
-          insultQuote = `Tufiakwa! You are looking for dirty stain on genuine original ${this.item.name}?! Because you insulted my market, the price is now ${NegotiationEngine.formatNaira(this.currentSellerPrice)}! Pay or leave my stall!`;
-        } else if (this.seller.name.includes("Chidi")) {
-          insultQuote = `Guy, you dey doubt Factory Unlocked Apple device with True Tone?! Because you disrespect original IMEI, the price na ${NegotiationEngine.formatNaira(this.currentSellerPrice)} now!`;
-        } else if (this.seller.name.includes("Danladi")) {
-          insultQuote = `Subhanallah! Sweet Grade-1 crop from Abuja you say get rot?! The price don rise to ${NegotiationEngine.formatNaira(this.currentSellerPrice)}!`;
-        } else if (this.seller.name.includes("Chief")) {
-          insultQuote = `Look this boy o! Pure copper coil generator you dey tap with finger?! The price don enter ${NegotiationEngine.formatNaira(this.currentSellerPrice)}! If you no get money, go buy candle!`;
-        }
+        let insultQuote = itemTactics?.backfireText
+          ? itemTactics.backfireText.replace(/{counter}/g, NegotiationEngine.formatNaira(this.currentSellerPrice))
+          : `God forbid! You dey find fault inside genuine original ${this.item.name}?! Because you disrespect my quality, the price don climb to ${NegotiationEngine.formatNaira(this.currentSellerPrice)}! Buy am or waka pass!`;
 
         return {
           action: "fault_find",
@@ -461,23 +454,27 @@ export class NegotiationEngine {
       if (success) {
         const drop = Math.round((this.currentSellerPrice - this.floorPrice) * 0.30);
         this.currentSellerPrice = Math.max(Math.round(this.floorPrice * 1.05), this.currentSellerPrice - drop);
+        const successQuote = itemTactics?.successText
+          ? itemTactics.successText.replace(/{counter}/g, NegotiationEngine.formatNaira(this.currentSellerPrice))
+          : `Ah ah, you spot small defect on this ${this.item.name}? Oya no wahala, I drop am to ${NegotiationEngine.formatNaira(this.currentSellerPrice)}.`;
         return {
           action: "fault_find",
           isBackfire: false,
           success: true,
           sellerPrice: this.currentSellerPrice,
           patience: this.patience,
-          text: `Ah ah, small loose thread or label na him you spot? Oya no wahala, I drop am to ${NegotiationEngine.formatNaira(this.currentSellerPrice)}.`
+          text: successQuote
         };
       } else {
         this.patience = Math.max(0, this.patience - 12);
+        const failQuote = itemTactics?.failText || `Commot for here! This ${this.item.name} clean pass your expectations! Which kind bad-eye you get?!`;
         return {
           action: "fault_find",
           isBackfire: false,
           success: false,
           sellerPrice: this.currentSellerPrice,
           patience: this.patience,
-          text: "Commot for here! Na high grade work! Which kind bad-eye you get?!"
+          text: failQuote
         };
       }
     }
@@ -491,11 +488,14 @@ export class NegotiationEngine {
       }
       const drop = Math.round((this.currentSellerPrice - this.floorPrice) * bluffMultiplier);
       this.currentSellerPrice = Math.max(Math.round(this.floorPrice * 1.06), this.currentSellerPrice - drop);
+      const fakeCallQuote = itemTactics?.sellerResponse
+        ? itemTactics.sellerResponse.replace(/{counter}/g, NegotiationEngine.formatNaira(this.currentSellerPrice))
+        : `Don't enter that crook shop at front! Take this ${this.item.name} for ${NegotiationEngine.formatNaira(this.currentSellerPrice)} right now!`;
       return {
         action: "fake_call",
         sellerPrice: this.currentSellerPrice,
         patience: this.patience,
-        text: `Don't enter that crook shop at front! Take am for ${NegotiationEngine.formatNaira(this.currentSellerPrice)} right now!`
+        text: fakeCallQuote
       };
     }
 
@@ -527,11 +527,11 @@ export class NegotiationEngine {
       if (this.currentSellerPrice <= target * thresholdMultiplier || Math.random() < successChance) {
         this.status = "agreed";
         this.agreedPrice = Math.max(this.floorPrice, target);
-        let acceptText = "You hold raw cash? Oya slap am on top table, carry your market go!";
+        let acceptText = itemTactics?.agreedResponse || `You hold raw cash? Oya slap am on top table, carry your ${this.item.name} go!`;
         if (this.dripPreset?.id === "ijgb") {
-          acceptText = "Oga London slapped crisp notes on the counter! Seller's eyes lit up: 'Deal closed, Chairman!'";
+          acceptText = `Oga London slapped crisp notes on the counter! Seller beamed: 'Deal closed on this ${this.item.name}, Chairman!'`;
         } else if (this.dripPreset?.id === "corporate") {
-          acceptText = "Instant bank transfer alert beeped! Seller beamed: 'Corporate alert confirmed! Carry am go!'";
+          acceptText = `Instant bank transfer alert beeped! Seller beamed: 'Corporate alert confirmed for ${this.item.name}! Carry am go!'`;
         }
         return {
           action: "show_cash",
@@ -541,11 +541,11 @@ export class NegotiationEngine {
         };
       } else {
         this.patience = Math.max(0, this.patience - 10);
-        let rejectText = "This small cash no reach my capital! Keep your change for taxi!";
+        let rejectText = itemTactics?.rejectResponse || `This small cash no reach my capital for ${this.item.name}! Keep your change for taxi!`;
         if (this.dripPreset?.id === "market_soldier" && this.item.isOriginal && this.item.askingPrice >= 35000) {
-          rejectText = "Seller sneered at your squeezed ₦200 notes: 'Oga street boy, this dirty change no fit buy original item! Keep am for okada!' (-10% Patience)";
+          rejectText = `Seller sneered at your squeezed ₦200 notes: 'Oga street boy, this dirty change no fit buy original ${this.item.name}! Keep am for okada!' (-10% Patience)`;
         } else if (this.dripPreset?.id === "student" && this.item.askingPrice >= 20000) {
-          rejectText = "Seller laughed: 'Student, put that small feeding allowance back before you buy gala!' (-10% Patience)";
+          rejectText = `Seller laughed: 'Student, put that small feeding allowance back before you buy gala!' (-10% Patience)`;
         }
         return {
           action: "show_cash",
@@ -625,8 +625,18 @@ export class NegotiationEngine {
   }
 
   _pickDialogue(category) {
-    const lines = this.seller.dialogue[category] || ["No comment."];
-    return lines[Math.floor(Math.random() * lines.length)];
+    let lines = this.item?.dialogue?.[category];
+    if (!lines || !lines.length) {
+      lines = this.seller?.dialogue?.[category];
+    }
+    if (!lines || !lines.length) {
+      lines = ["Drop {counter} make we talk.", "Last price na {counter}.", "Take am for {counter}."];
+    }
+    const picked = lines[Math.floor(Math.random() * lines.length)];
+    return picked
+      .replace(/{counter}/g, NegotiationEngine.formatNaira(this.currentSellerPrice))
+      .replace(/{itemName}/g, this.item?.name || "this item")
+      .replace(/{sellerName}/g, this.seller?.name || "Oga");
   }
 }
 
